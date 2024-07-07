@@ -1,27 +1,29 @@
-var students = [
-  {name: 'Alfred'},
-  {name: 'Angel'},
-  {name: 'Asma'},
-  {name: 'Aswad'},
-  {name: 'Chris Carpio'},
-  {name: 'Chris Gomez'},
-  {name: 'David'},
-  {name: 'Edgar'},
-  {name: 'Eyerin'},
-  {name: 'Ian'},
-  {name: 'Jereny'},
-  {name: 'Joshua'},
-  {name: 'Mac'},
-  {name: 'Meylan'},
-  {name: 'Nestasia'},
-  {name: 'Randy'},
-  {name: 'Rashamel'},
-  {name: 'Sidney'}
+var people = [
+  {name: 'Person 1'},
+  {name: 'Person 2'},
+  {name: 'Person 3'},
+  {name: 'Person 4'},
+  {name: 'Person 5'},
+  {name: 'Person 6'},
+  {name: 'Person 7'},
+  {name: 'Person 8'}
 ];
 
-var shuffle = function (o) {
-  for (var j, x, i = o.length; i; j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
-  return o;
+var shuffle = function (objects) {
+  var jdx, item;
+
+  // Loop over the array in reverse order
+  for (var idx = objects.length; idx > 0; idx--) {
+    // Generate a random index j
+    jdx = parseInt(Math.random() * idx);
+    
+    // Swap elements at indices i-1 and j
+    item = objects[idx - 1];
+    objects[idx - 1] = objects[jdx];
+    objects[jdx] = item;
+  }
+
+  return objects;
 };
 
 var hashCode = function (string) {
@@ -39,14 +41,81 @@ var mod = function (a, b) {
   return ((a % b) + b) % b;
 };
 
-$(function () {
-  var studentContainer = $('#students ul');
-  students.forEach(function (student) {
-    var name = student.name;
-    studentContainer.append(
+var buildName = function(person) {
+  // if it's an object, extract the name property
+  var name = typeof person === 'object' ? person.name : person;
+  return {name: name, id: "name_" + hashCode(name)};
+};
+
+people = people.map(buildName);
+
+$(document).ready(function() {
+  $('#peopleInput').val(function () {
+    var names = []
+
+    // Iterate over the people array to extract names
+    for (var i = 0; i < people.length; i++) {
+      names.push(people[i].name);
+    }
+
+    // Join the names array into a string, separated by newline characters
+    return names.join('\n');
+  });
+
+  $('#goButton').click(function() {
+    var inputNames = $('#peopleInput').val().split('\n');
+    var $list = $('#left #people ul').empty(); // Clear existing list and select the ul
+
+    $.each(inputNames, function(i, name) {
+      if (name.trim() !== '') { // Ignore empty lines
+        var hash = hashCode(name);
+
+        var $li = $('<li/>');
+        var $checkbox = $('<input/>', {
+          type: 'checkbox',
+          id: 'name_' + hash, // Ensure unique ID
+          checked: true,
+          value: name
+        });
+        var $label = $('<label/>', {
+          for: 'name_' + hash,
+          text: name
+        });
+        people.pop(buildName(name));
+
+        $li.append($checkbox).append($label);
+        $list.append($li);
+      }
+    });
+
+    $('#configure-people').hide();
+    $('#people-list').show();
+    $('section#right').show();
+  });
+
+  $('#editButton').click(function() {
+    var $list = $("#left #people ul li");
+
+    people = $list
+      .map(function() {
+        return $(this).find('input').val();
+      })
+      .get()
+      .map(buildName);
+
+    // Show the configure div and hide the people list
+    $('#configure-people').show();
+    $('#people-list').hide();
+    $('section#right').hide();
+  });
+
+  var peopleContainer = $('#left #people ul');
+  people.forEach(function (person) {
+    var name = person.name;
+    peopleContainer.append(
       $(document.createElement('li')).append(
         $(document.createElement('input')).attr({
-          id: 'student-' + name,
+          id: 'person-' + name,
           name: name,
           value: name,
           type: 'checkbox',
@@ -58,8 +127,8 @@ $(function () {
 
           if (cbox.checked && i == -1) {
             segments.push(cbox.value);
-
-          } else if (!cbox.checked && i != -1) {
+          }
+          else if (!cbox.checked && i != -1) {
             segments.splice(i, 1);
           }
 
@@ -68,16 +137,16 @@ $(function () {
         })
       ).append(
         $(document.createElement('label')).attr({
-          'for': 'student-' + name
+          'for': 'person-' + name
         }).text(name)));
   });
 
-  $('#students ul>li').tsort('input', {
+  $('#people ul>li').tsort('input', {
     attr: 'value'
   });
-
+  
   var segments = [];
-  $.each($('#students input:checked'), function (key, cbox) {
+  $.each($('#people input:checked'), function (key, cbox) {
     segments.push(cbox.value);
   });
 

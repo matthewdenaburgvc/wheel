@@ -5,7 +5,8 @@
     <meta http-equiv='X-UA-Compatible' content='chrome=1'>
     <title>Wheel by inlinestyle</title>
     <link rel='stylesheet' href='stylesheets/styles.css'>
-    <link rel='stylesheet' href='stylesheets/github-light.css'>
+    <link rel='stylesheet' href='stylesheets/light.css'>
+    <!-- <link rel='stylesheet' href='stylesheets/dark.css'> -->
     <meta name='viewport' content='width=device-width'>
   </head>
   <body>
@@ -17,17 +18,29 @@
         <p class='view'>
           <a href='https://github.com/inlinestyle/wheel'>View the Project on GitHub <small>inlinestyle/wheel</small></a>
         </p>
-        <ul>
+        <!-- <ul>
           <li><a href='https://github.com/inlinestyle/wheel/zipball/master'>Download <strong>ZIP File</strong></a></li>
           <li><a href='https://github.com/inlinestyle/wheel/tarball/master'>Download <strong>TAR Ball</strong></a></li>
           <li><a href='https://github.com/inlinestyle/wheel'>View On <strong>GitHub</strong></a></li>
-        </ul>
+        </ul> -->
       </header>
-      <section>
+      <section id="left" >
+        <div id="configure-people">
+          <textarea name="peopleInput" id="peopleInput"></textarea>
+          <button id="goButton">Go</button>
+        </div>
+        <div id="people-list">
+          <div id="people">
+            <ul/>
+          </div>
+          <button id="editButton">Edit</button>
+        </div>
+      </section>
+      <section id="right">
         <div id='wheel' >
           <canvas id='canvas' width='1000' height='600'></canvas>
         </div>
-        <div id='students'>
+        <div id="people">
           <ul/>
         </div>
       </section>

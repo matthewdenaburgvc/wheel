@@ -1,10 +1,8 @@
 # Wheel of Names
 
-<small>*Replacement for <https://wheelofnames.com/>.*</small>
+Replacement for <https://wheelofnames.com>.
 
 ## Features
-
-### Coming Soon
 
 Will develop:
 

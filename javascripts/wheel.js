@@ -64,7 +64,7 @@ $(document).ready(function() {
 
   $('#goButton').click(function() {
     var inputNames = $('#peopleInput').val().split('\n');
-    var $list = $('#left #people ul').empty(); // Clear existing list and select the ul
+    var $list = $('#people ul').empty(); // Clear existing list and select the ul
 
     $.each(inputNames, function(i, name) {
       if (name.trim() !== '') { // Ignore empty lines
@@ -89,12 +89,11 @@ $(document).ready(function() {
     });
 
     $('#configure-people').hide();
-    $('#people-list').show();
-    $('section#right').show();
+    $('#people').show();
   });
 
   $('#editButton').click(function() {
-    var $list = $("#left #people ul li");
+    var $list = $("#people ul li");
 
     people = $list
       .map(function() {
@@ -105,11 +104,10 @@ $(document).ready(function() {
 
     // Show the configure div and hide the people list
     $('#configure-people').show();
-    $('#people-list').hide();
-    $('section#right').hide();
+    $('#people').hide();
   });
 
-  var peopleContainer = $('#left #people ul');
+  var peopleContainer = $('#people ul');
   people.forEach(function (person) {
     var name = person.name;
     peopleContainer.append(
@@ -164,14 +162,14 @@ var wheel = {
   angleCurrent: 0,
   angleDelta: 0,
   canvasContext: null,
-  centerX: 300,
-  centerY: 300,
+  centerX: 50,
+  centerY: 50,
   colorCache: [],
   downTime: 2000,
   frames: 0,
   maxSpeed: Math.PI / 16,
   segments: [],
-  size: 290,
+  size: 100,
   spinStart: 0,
   timerDelay: 33,
   timerHandle: 0,
@@ -274,7 +272,7 @@ var wheel = {
 
   clear: function () {
     var ctx = wheel.canvasContext;
-    ctx.clearRect(0, 0, 1000, 800);
+    ctx.clearRect(0, 0, this.width, this.height);
   },
 
   drawNeedle: function () {

@@ -16,6 +16,7 @@ Will develop:
 Considering:
 
 - [ ] save config to ... cookies?
+- [ ] confetti
 
 ## Credits
 

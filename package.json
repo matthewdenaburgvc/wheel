@@ -4,7 +4,7 @@
     "description": "Replacement for <https://wheelofnames.com>.",
     "main": "index.js",
     "scripts": {
-        "build-css": "sass --watch src/styles/main.scss:public/css/main.css"
+        "build-css": "sass --watch src/styles/styles.scss:public/css/styles.css"
     },
     "repository": {
         "url": "git@github.com:matthewdenaburgvc/wheel.git",
@@ -24,7 +24,9 @@
     },
     "devDependencies": {
         "prettier": "^3.3.3",
-        "sass": "^1.77.8"
+        "prettier-plugin-tailwindcss": "^0.6.5",
+        "sass": "^1.77.8",
+        "tailwindcss": "^3.4.4"
     },
     "dependencies": {
         "jquery": "^3.7.1",

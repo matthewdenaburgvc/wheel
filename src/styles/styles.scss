@@ -1,0 +1,142 @@
+.light-mode {
+    --background-color: #FFF;
+    --textarea-background-color: #FFF;
+    --text-color: #888;
+    --strong-color: #222;
+    --h1-color: #444;
+    --h2-color: #666;
+    --link-color: #39C;
+    --link-hover-color: #069;
+    --link-small-color: #888;
+    --border-color: #E5E5E5;
+    --hr-color: #F0F0F0;
+    --code-text-color: #222;
+}
+
+.dark-mode {
+    --background-color: #222;
+    --textarea-background-color: #444;
+    --text-color: #FFF;
+    --strong-color: #F0F0F0;
+    --h1-color: #CCC;
+    --h2-color: #AAA;
+    --link-color: #39C;
+    --link-hover-color: #069;
+    --link-small-color: #AAA;
+    --border-color: #E5E5E5;
+    --hr-color: #E5E5E5;
+    --code-text-color: #E5E5E5;
+}
+
+body {
+    background-color: var(--background-color);
+    padding: 5vh 10vw; // TODO
+    font-size: 14px/1.5;
+    font-family: Arial, sans-serif;
+    color: var(--text-color);
+
+    h1 {
+        color: var(--h1-color);
+        font-size: 1.75rem;
+    }
+    h2 {
+        color: var(--h2-color);
+    }
+    h1, h2 {
+        margin: 0 0 2vh;
+        line-height: 1.1;
+    }
+
+    p, ul {
+        margin: 0 0 2vh;
+    }
+
+    a {
+        color: var(--link-color);
+        text-decoration: none;
+
+        &:hover {
+            color: var(--link-hover-color);
+        }
+        small {
+            margin-top: -0.3em;
+            display: block;
+            color: var(--link-small-color);
+        }
+    }
+    small {
+        font-size: .7rem;
+    }
+    hr {
+        border: 0;
+        background: var(--hr-color);
+        height: 1px;
+    }
+    strong {
+        color: var(--strong-color);
+        font-weight: bold;
+    }
+
+    textarea {
+        resize: vertical;
+        background-color: var(--textarea-background-color);
+        color: var(--code-text-color);
+    }
+
+    .wrapper {
+        margin: 0;
+        width: 100%;
+        height: 80vh;
+        display: flex;
+        flex-basis: content;
+
+        .left, .right {
+            display: flex;
+            height: 100%;
+            flex-basis: content;
+
+            .content {
+                width: 100%;
+            }
+        }
+        
+        .left {
+            flex-basis: 25vw;
+            flex-direction: column;
+
+            .header {
+                max-width: 100%;
+            }
+            .footer {
+                font-size: 0.75rem;
+            }
+
+            .header,
+            .footer {
+                min-height: 20%;
+                height: 20%;
+                max-height: 20%;
+            }
+
+            textarea {
+                width: 100%;
+                height: 100%;
+            }
+        }
+        .right {
+            width: 75vw;
+        }
+    }
+
+    #people {
+        display: none;
+    }
+
+    #canvas {
+        height: 100%;
+        width: 100%;
+
+        border: 1px solid var(--border-color);
+        border-radius: 5px;
+    }
+}

@@ -4,7 +4,7 @@
     "description": "Replacement for <https://wheelofnames.com>.",
     "main": "index.js",
     "scripts": {
-        "build-css": "sass --no-source-map --watch src/scss/main.scss public/css/main.css"
+        "build-css": "sass --no-source-map --watch src/scss/main.scss docs/css/main.css"
     },
     "repository": {
         "url": "git@github.com:matthewdenaburgvc/wheel.git",

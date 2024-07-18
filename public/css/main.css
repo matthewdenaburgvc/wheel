@@ -1,0 +1,128 @@
+:root {
+  --link-color: #3399CC;
+  --link-hover-color: #006699;
+}
+
+.light-mode {
+  --background-color: #FFFFFF;
+  --textarea-background-color: #FFFFFF;
+  --text-color: #888888;
+  --strong-color: #222222;
+  --h1-color: #444444;
+  --h2-color: #666666;
+  --small-color: #888888;
+  --border-color: #E5E5E5;
+  --hr-color: #F0F0F0;
+  --code-text-color: #222222;
+}
+
+.dark-mode {
+  --background-color: #222222;
+  --textarea-background-color: #444444;
+  --text-color: #FFFFFF;
+  --strong-color: #F0F0F0;
+  --h1-color: #CCCCCC;
+  --h2-color: #AAAAAA;
+  --small-color: #AAAAAA;
+  --border-color: #E5E5E5;
+  --hr-color: #E5E5E5;
+  --code-text-color: #E5E5E5;
+}
+
+body {
+  background-color: var(--background-color);
+  padding: 5vh 10vw;
+  font-size: 14px/1.5;
+  font-family: Arial, sans-serif;
+  color: var(--text-color);
+}
+body h1 {
+  color: var(--h1-color);
+  font-size: 1.75rem;
+}
+body h2 {
+  color: var(--h2-color);
+}
+body h1, body h2 {
+  margin: 0 0 2vh;
+  line-height: 1.1;
+}
+body p, body ul {
+  margin: 0 0 2vh;
+}
+body a {
+  color: var(--link-color);
+  text-decoration: none;
+}
+body a:hover {
+  color: var(--link-hover-color);
+}
+body a small {
+  margin-top: -0.3em;
+  display: block;
+  color: var(--small-color);
+}
+body small {
+  font-size: 0.7rem;
+}
+body hr {
+  border: 0;
+  background: var(--hr-color);
+  height: 1px;
+}
+body strong {
+  color: var(--strong-color);
+  font-weight: bold;
+}
+body textarea {
+  resize: vertical;
+  background-color: var(--textarea-background-color);
+  color: var(--code-text-color);
+}
+body .wrapper {
+  margin: 0;
+  width: 100%;
+  height: 80vh;
+  display: flex;
+  flex-basis: content;
+}
+body .wrapper .left, body .wrapper .right {
+  display: flex;
+  height: 100%;
+  flex-basis: content;
+}
+body .wrapper .left .content, body .wrapper .right .content {
+  width: 100%;
+}
+body .wrapper .left {
+  flex-basis: 25vw;
+  flex-direction: column;
+}
+body .wrapper .left .header {
+  max-width: 100%;
+}
+body .wrapper .left .footer {
+  font-size: 0.75rem;
+}
+body .wrapper .left .header,
+body .wrapper .left .footer {
+  min-height: 20%;
+  height: 20%;
+  max-height: 20%;
+}
+body .wrapper .left textarea {
+  width: 100%;
+  height: 100%;
+}
+body .wrapper .right {
+  width: 75vw;
+}
+body #people {
+  display: none;
+}
+body #canvas {
+  height: 100%;
+  width: 100%;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+}

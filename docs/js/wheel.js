@@ -1,22 +1,17 @@
-var people = [
-  {name: 'Person 1'},
-  {name: 'Person 2'},
-  {name: 'Person 3'},
-  {name: 'Person 4'},
-  {name: 'Person 5'},
-  {name: 'Person 6'},
-  {name: 'Person 7'},
-  {name: 'Person 8'}
-];
-
-var shuffle = function (objects) {
+/**
+ * Randomly shuffles the elements in an array in place.
+ *
+ * @param {Array} objects The array to be shuffled.
+ * @returns {Array} The shuffled array.
+ */
+var shuffle = function(objects) {
   var jdx, item;
 
   // Loop over the array in reverse order
   for (var idx = objects.length; idx > 0; idx--) {
     // Generate a random index j
     jdx = parseInt(Math.random() * idx);
-    
+
     // Swap elements at indices i-1 and j
     item = objects[idx - 1];
     objects[idx - 1] = objects[jdx];
@@ -26,9 +21,16 @@ var shuffle = function (objects) {
   return objects;
 };
 
+/**
+ * Hash a string to a 32-bit integer
+ *
+ * @param {string} string the string to hash
+ * @returns {number} the hash code of the string
+ */
 var hashCode = function (string) {
   // See http://www.cse.yorku.ca/~oz/hash.html
-  var hash = 5381;
+  var hash = 97;
+
   for (i = 0; i < string.length; i++) {
     var char = string.charCodeAt(i);
     hash = ((hash << 5) + hash) + char;
@@ -37,20 +39,39 @@ var hashCode = function (string) {
   return hash;
 };
 
+/**
+ * Calculates the modulo of two numbers.
+ *
+ * @param {number} a The dividend.
+ * @param {number} b The divisor.
+ * @returns {number} The modulo of `a` and `b`.
+ */
 var mod = function (a, b) {
   return ((a % b) + b) % b;
 };
 
 var buildName = function(person) {
-  // if it's an object, extract the name property
+  // if it's an object, extract the name property. otherwise, just use the value.
   var name = typeof person === 'object' ? person.name : person;
+
   return {name: name, id: "name_" + hashCode(name)};
 };
 
+var people = [
+  {name: 'Person 1'},
+  {name: 'Person 2'},
+  {name: 'Person 3'},
+  {name: 'Person 4'},
+  {name: 'Person 5'},
+  {name: 'Person 6'},
+  {name: 'Person 7'},
+  {name: 'Person 8'},
+];
 people = people.map(buildName);
 
 $(document).ready(function() {
-  $('#peopleInput').val(function () {
+  // add all of the people to the text area
+  $('#people-input').val(function () {
     var names = []
 
     // Iterate over the people array to extract names
@@ -62,8 +83,9 @@ $(document).ready(function() {
     return names.join('\n');
   });
 
-  $('#goButton').click(function() {
-    var inputNames = $('#peopleInput').val().split('\n');
+  // show the checkboxes
+  $('#go-button').click(function() {
+    var inputNames = $('#people-input').val().split('\n');
     var $list = $('#people ul').empty(); // Clear existing list and select the ul
 
     $.each(inputNames, function(i, name) {
@@ -92,7 +114,8 @@ $(document).ready(function() {
     $('#people').show();
   });
 
-  $('#editButton').click(function() {
+  // hide the checkboxes and hsow the textarea
+  $('#edit-button').click(function() {
     var $list = $("#people ul li");
 
     people = $list
@@ -113,7 +136,7 @@ $(document).ready(function() {
     peopleContainer.append(
       $(document.createElement('li')).append(
         $(document.createElement('input')).attr({
-          id: 'person-' + name,
+          id: 'name_' + hashCode(name),
           name: name,
           value: name,
           type: 'checkbox',
@@ -134,15 +157,19 @@ $(document).ready(function() {
           wheel.update();
         })
       ).append(
-        $(document.createElement('label')).attr({
-          'for': 'person-' + name
-        }).text(name)));
+        $(document.createElement('label')).attr(
+          {
+            'for': 'name_' + hashCode(name),
+          }
+        ).text(name)
+      )
+    );
   });
 
-  $('#people ul>li').tsort('input', {
-    attr: 'value'
-  });
-  
+  $('#people ul>li').tsort(
+    'input', { attr: 'value' }
+  );
+
   var segments = [];
   $.each($('#people input:checked'), function (key, cbox) {
     segments.push(cbox.value);
@@ -156,7 +183,34 @@ $(document).ready(function() {
   setTimeout(function () {
     window.scrollTo(0, 1);
   }, 0);
+
+  darkModeToggler();
 });
+
+var baseColors = {
+  white: '#ffffff',
+  gray_1: '#f0f0f0',
+  gray_2: '#cccccc',
+  gray_3: '#aaaaaa',
+  gray_4: '#888888',
+  gray_5: '#666666',
+  gray_6: '#444444',
+  gray_7: '#222222',
+  black: '#000000',
+};
+
+var themeColors = {
+  dark: {
+    fill: baseColors.white,
+    stroke: baseColors.gray_6,
+    text: baseColors.white,
+  },
+  light: {
+    fill: baseColors.gray_7,
+    stroke: baseColors.gray_7,
+    text: baseColors.black,
+  },
+}
 
 var wheel = {
   angleCurrent: 0,
@@ -175,11 +229,14 @@ var wheel = {
   timerDelay: 33,
   timerHandle: 0,
   upTime: 1000,
+  fillColor: null,
+  strokeColor: null,
+  textColor: null,
 
   wheelLocation: function() {
     var $wheel = document.getElementById('canvas');;
 
-    wheel.centerX = $wheel.width / 2;
+    wheel.centerX = $wheel.width / 3;
     wheel.centerY = $wheel.height / 2;
     wheel.size = Math.min($wheel.height, $wheel.width) / 2 - wheel.bullseyeSize;
   },
@@ -230,27 +287,36 @@ var wheel = {
     try {
       wheel.initWheel();
       wheel.initCanvas();
+      wheel.setTheme();
       wheel.draw();
       $.extend(wheel, optionList);
     } catch (exceptionData) {
-    //   alert('Wheel is not loaded ' + exceptionData);
+      alert('Wheel is not loaded ' + exceptionData);
     }
-  },
-
-  initCanvas: function () {
-    var canvas = $('#wheel #canvas').get(0);
-    canvas.addEventListener('click', wheel.spin, false);
-    wheel.canvasContext = canvas.getContext('2d');
   },
 
   initWheel: function () {
     shuffle(spectrum);
   },
 
+  initCanvas: function () {
+    var canvas = $('#canvas').get(0);
+    canvas.addEventListener('click', wheel.spin, false);
+    wheel.canvasContext = canvas.getContext('2d');
+  },
+
+  setTheme: function() {
+    var $body = $('body');
+    var theme = $body.hasClass('dark-mode') ? themeColors.dark : themeColors.light;
+
+    wheel.fillColor = theme.fill;
+    wheel.strokeColor = theme.stroke;
+    wheel.textColor = theme.text;
+  },
+
   update: function () {
     // Ensure we start mid way on a item
     var r = Math.floor(Math.random() * wheel.segments.length);
-    //var r = 0;
     wheel.angleCurrent = ((r + 0.5) / wheel.segments.length) * Math.PI * 2;
 
     var segments = wheel.segments;
@@ -267,14 +333,16 @@ var wheel = {
   },
 
   draw: function () {
+    wheel.setTheme();
     wheel.clear();
     wheel.drawWheel();
     wheel.drawNeedle();
   },
 
   clear: function () {
+    var $canvas = $('#canvas');
     var ctx = wheel.canvasContext;
-    ctx.clearRect(0, 0, this.width, this.height);
+    ctx.clearRect(0, 0, $canvas.width(), $canvas.height());
   },
 
   drawNeedle: function () {
@@ -284,8 +352,8 @@ var wheel = {
     var size = wheel.size;
 
     ctx.lineWidth = 1;
-    ctx.strokeStyle = '#000000';
-    ctx.fillStyle = '#ffffff';
+    ctx.strokeStyle = wheel.strokeColor;
+    ctx.fillStyle = wheel.fillColor;
 
     ctx.beginPath();
 
@@ -303,7 +371,7 @@ var wheel = {
     // Now draw the winning name
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
-    ctx.fillStyle = '#000000';
+    ctx.fillStyle = wheel.textColor;
     ctx.font = '1rem Arial';
     ctx.fillText(wheel.segments[i], centerX + size + wheel.bullseyeSize * 2.5, centerY);
   },
@@ -335,7 +403,7 @@ var wheel = {
     ctx.translate(centerX, centerY);
     ctx.rotate((lastAngle + angle) / 2);
 
-    ctx.fillStyle = '#000000';
+    ctx.fillStyle = wheel.textColor;
     ctx.font = '8px Arial';
     ctx.fillText(value.substr(0, 20), size / 2 + wheel.bullseyeSize, 0);
     ctx.restore();
@@ -360,7 +428,7 @@ var wheel = {
     var PI2 = Math.PI * 2;
 
     ctx.lineWidth = 1;
-    ctx.strokeStyle = '#000000';
+    ctx.strokeStyle = wheel.strokeColor;
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
     ctx.font = '1.4rem Arial';
@@ -375,8 +443,8 @@ var wheel = {
     ctx.arc(centerX, centerY, 10, 0, PI2, false);
     ctx.closePath();
 
-    ctx.fillStyle = '#ffffff';
-    ctx.strokeStyle = '#000000';
+    ctx.fillStyle = wheel.fillColor;
+    ctx.strokeStyle = wheel.strokeColor;
     ctx.fill();
     ctx.stroke();
 
@@ -386,7 +454,7 @@ var wheel = {
     ctx.closePath();
 
     ctx.lineWidth = 10;
-    ctx.strokeStyle = '#000000';
+    ctx.strokeStyle = wheel.strokeColor;
     ctx.stroke();
   }
 };
@@ -394,3 +462,48 @@ var wheel = {
 var spectrum = ['#A2395B', '#A63552', '#AA3149', '#AE2D40', '#B22937', '#A23A53', '#924B6F', '#825C8B', '#6F6DA7', '#A63570', '#AC2F5A', '#B22944', '#B8232E', '#C11C17', '#A72A37', '#8D3857', '#734677', '#575597', '#A6358C', '#B43B6A', '#C24148', '#D04726', '#DE5003', '#B84D24', '#924A45', '#6C4766', '#434187', '#A650A0', '#B55A80', '#C46460', '#D36E40', '#E27A1D', '#B26331', '#824C45', '#523559', '#1F1D6D', '#A660AC', '#B67288', '#C68464', '#D69640', '#E6AA19', '#BC892E', '#926843', '#684758', '#3B256D', '#A670B8', '#B8878E', '#CA9E64', '#DCB53A', '#EFCE10', '#C8A628', '#A17E40', '#7A5658', '#502E72', '#80529A', '#98777A', '#B09C5A', '#C8C13A', '#E0E61A', '#C8C13A', '#B09C5A', '#98777A', '#80529A', '#502E72', '#675860', '#7E824E', '#95AC3C', '#ACD62A', '#ABBD4D', '#AAA470', '#A98B93', '#A670B8', '#3B256D', '#4C4D60', '#5D7553', '#6E9D46', '#80C837', '#89AE54', '#929471', '#9B7A8E', '#A660AC', '#1F1D6D', '#2A3F5D', '#35614D', '#40833D', '#4CA82B', '#629248', '#787C65', '#8E6682', '#A650A0', '#434187', '#3B536E', '#336555', '#2B773C', '#228B22', '#43763C', '#646156', '#854C70', '#A6358C', '#575597', '#4A678D', '#3D7983', '#308B79', '#229F6E', '#43856E', '#646B6E', '#85516E', '#A63570', '#6F6DA7', '#5C7EA7', '#498FA7', '#36A0A7', '#20B2AA', '#409497', '#607684', '#805871', '#A2395B', '#7F91C3', '#789AC4', '#71A3C5', '#6AACC6', '#60B6CA', '#7493A6', '#887082', '#9C4D5E', '#B22937', '#71A3C5', '#79A9CD', '#81AFD5', '#89B5DD', '#93BDE7', '#9E95B3', '#A96D7F', '#B4454B', '#C11C17', '#60B6CA', '#67ADC9', '#6EA4C8', '#759BC7', '#7F91C3', '#968193', '#AD7163', '#C46133', '#DE5003', '#20B2AA', '#33A1AA', '#4690AA', '#597FAA', '#6F6DA7', '#8B7085', '#A77363', '#C37641', '#E27A1D', '#229F6E', '#2F8D78', '#3C7B82', '#49698C', '#575597', '#7A6A78', '#9D7F59', '#C0943A', '#E6AA19', '#228B22', '#2A793B', '#326754', '#3A556D', '#434187', '#6E646A', '#99874D', '#C4AA30', '#EFCE10', '#4CA82B', '#41863B', '#36644B', '#2B425B', '#1F1D6D', '#4F4F58', '#808244', '#B0B42F', '#E0E61A', '#80C837', '#6FA044', '#5E7851', '#4D505E', '#3B256D', '#57515C', '#747E4C', '#90AA3B', '#ACD62A'];
 
 $(window).resize(wheel.update);
+
+/** Toggles between light and dark mode */
+var darkModeToggler = function() {
+  const darkThemeClass = 'dark-mode';
+  const lightThemeClass = 'light-mode';
+  const $themeToggle = $('#theme-toggle');
+
+  function applyDarkMode() {
+    $('body').addClass(darkThemeClass);
+    wheel.draw();
+    localStorage.setItem('theme', darkThemeClass);
+  }
+
+  function removeDarkMode() {
+    $('body').removeClass(darkThemeClass);
+    wheel.draw();
+    localStorage.setItem('theme', lightThemeClass);
+  }
+
+  // Function to toggle dark mode
+  function toggleDarkMode() {
+    if ($('body').hasClass(darkThemeClass)) {
+      removeDarkMode();
+    } else {
+      applyDarkMode();
+    }
+  }
+
+  // Check for a saved user preference, and apply it
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme) {
+    if (savedTheme === darkThemeClass) {
+      applyDarkMode();
+    } else {
+      removeDarkMode();
+    }
+  }
+  else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    // If no saved preference, apply system preference
+    applyDarkMode();
+  }
+
+  // Event listener for the theme toggle button
+  $themeToggle.click(toggleDarkMode);
+};

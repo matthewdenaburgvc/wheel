@@ -182,8 +182,6 @@ var wheel = {
     wheel.centerX = $wheel.width / 2;
     wheel.centerY = $wheel.height / 2;
     wheel.size = Math.min($wheel.height, $wheel.width) / 2 - wheel.bullseyeSize;
-
-    // $("#wheelLoc1").text(wheel.centerX + ", " + wheel.centerY + "\nsize:" + wheel.size);
   },
 
   spin: function () {
@@ -216,23 +214,16 @@ var wheel = {
     }
 
     wheel.angleCurrent += wheel.angleDelta;
-    while (wheel.angleCurrent >= Math.PI * 2)
+    while (wheel.angleCurrent >= Math.PI * 2) {
       // Keep the angle in a reasonable range
       wheel.angleCurrent -= Math.PI * 2;
+    }
 
     if (finished) {
       clearInterval(wheel.timerHandle);
       wheel.timerHandle = 0;
       wheel.angleDelta = 0;
-
-      $('#counter').html((wheel.frames / duration * 1000) + ' FPS');
     }
-
-    /*
-     // Display RPM
-     var rpm = (wheel.angleDelta * (1000 / wheel.timerDelay) * 60) / (Math.PI * 2);
-     $('#counter').html( Math.round(rpm) + ' RPM' );
-     */
   },
 
   init: function (optionList) {

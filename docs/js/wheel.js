@@ -50,24 +50,203 @@ var mod = function (a, b) {
   return ((a % b) + b) % b;
 };
 
-var buildName = function(person) {
-  // if it's an object, extract the name property. otherwise, just use the value.
-  var name = typeof person === 'object' ? person.name : person;
-
-  return {name: name, id: "name_" + hashCode(name)};
+var buildPerson = function(name) {
+  return {
+    id: "id_" + hashCode(name),
+    name: name,
+    hash: hashCode(name),
+  };
 };
 
-var people = [
-  {name: 'Person 1'},
-  {name: 'Person 2'},
-  {name: 'Person 3'},
-  {name: 'Person 4'},
-  {name: 'Person 5'},
-  {name: 'Person 6'},
-  {name: 'Person 7'},
-  {name: 'Person 8'},
-];
-people = people.map(buildName);
+var people = (function() {
+  let res = [];
+  for (let i = 1; i <= 8; i++) {
+    res.push(buildPerson(`Person ${i}`));
+  }
+  return res;
+})();
+
+var baseColors = {
+  white: '#ffffff',
+  gray_1: '#444444',
+  gray_2: '#222222',
+  black: '#000000',
+};
+
+var themeColors = {
+  dark: {
+    fill: baseColors.white,
+    stroke: baseColors.gray_1,
+    text: baseColors.white,
+  },
+  light: {
+    fill: baseColors.gray_2,
+    stroke: baseColors.gray_2,
+    text: baseColors.black,
+  },
+}
+
+class WheelSlice {
+  static nextId = 0;
+  static #svgNS = "http://www.w3.org/2000/svg";
+
+  constructor(startAngleDegrees, endAngleDegrees, radius, text = null, fillColor = null) {
+    this.radius = radius;
+    this.fillColor = fillColor;
+    this.text = text == null ? '' : text.trim();
+    this.textColor = '#fff';
+
+    // convert degrees to radians
+    let startAngle = (startAngleDegrees * Math.PI) / 180;
+    let endAngle = (endAngleDegrees * Math.PI) / 180;
+
+    // build the start and end points, and then calculate the middle of each slice.
+    this.start = {
+      angle: startAngle,
+      x: this.radius + this.radius * Math.cos(startAngle),
+      y: this.radius + this.radius * Math.sin(startAngle),
+    }
+    this.end = {
+      angle: endAngle,
+      x: this.radius + this.radius * Math.cos(endAngle),
+      y: this.radius + this.radius * Math.sin(endAngle),
+    }
+    this.mid = {
+      angle: (startAngle + endAngle) / 2,
+      x: this.radius / 2 + Math.cos((startAngle + endAngle) / 2),
+      y: this.radius / 2 + Math.sin((startAngle + endAngle) / 2),
+    }
+
+    this.id = `wheel-slice-${WheelSlice.nextId++}`;
+  };
+
+  draw() {
+    this.drawSlice();
+    this.drawText();
+    this.drawContent();
+
+    return this.content;
+  };
+
+  drawText() {
+    const calculatedFontSize = Math.max(this.radius / 10, 5);
+
+    this.textPath = $(document.createElementNS(WheelSlice.#svgNS, 'textPath'))
+      .attr('href', `#${this.id}`)
+      .text(this.text);
+
+    this.svgText = $(document.createElementNS(WheelSlice.#svgNS, 'text'))
+      .attr('x', this.mid.x)
+      .attr('y', this.mid.y)
+      .attr('text-anchor', 'middle')
+      .attr('dominant-baseline', 'hanging')
+      .attr('fill', this.textColor)
+      .css('font-size', `${calculatedFontSize}px`)
+      .append(this.textPath);
+  };
+
+  buildPathString() {
+    // Use SVG arc to create the rounded effect
+    let largeArcFlag = this.end.angle - this.start.angle <= Math.PI ? '0' : '1';
+
+    let pathComponents = [];
+    // Move to starting point without drawing anything
+    pathComponents.push(`M ${this.radius},${this.radius}`);
+    // Draw a line from the current position to `${startX},${startY}`
+    pathComponents.push(`L ${this.start.x},${this.start.y}`);
+    // Draw an arc...
+    // - start at the current (startX, startY)
+    // - The arc's X and Y radii are the same (`radius`)
+    // - The 0 after the radii indicates the x-axis rotation, which is 0 degrees here, meaning there's no rotation.
+    // - The `largeArcFlag` determines whether the arc should be greater than or less than 180 degrees (0 for < 180 degrees, 1 for > 180 degrees).
+    // - The 1 after the largeArcFlag is the sweep flag, indicating counter clockwise
+    // - The arc ends at `${endX},${endY}`
+    pathComponents.push(`A ${this.radius},${this.radius} 0 ${largeArcFlag} 1 ${this.end.x},${this.end.y}`);
+    // Close the path by drawing a line back to the starting point
+    pathComponents.push(`Z`);
+
+    return pathComponents.join(' ');
+  };
+
+  drawSlice() {
+    const pathString = this.buildPathString()
+
+    this.path = $(document.createElementNS(WheelSlice.#svgNS, 'path'))
+      .attr('d', pathString)
+      .attr('id', this.id)
+      .attr('fill', this.fillColor);
+  };
+
+  drawContent() {
+    if (this.path == null) {
+      this.drawSlice();
+    }
+    if (this.svgText == null) {
+      this.drawText();
+    }
+
+    this.content = $(document.createElementNS(WheelSlice.#svgNS, 'svg'))
+      .attr('viewBox', `0 0 ${this.radius * 2} ${this.radius * 2}`)
+      .addClass('wheel-slice')
+      .append(this.path)
+      .append(this.svgText);
+  };
+};
+
+class Wheel {
+  constructor(radius) {
+    this.radius = radius;
+    this.angle = 360;
+    this.availableColors = [];
+    this.people = [];
+    this.slices = [];
+  };
+
+  init() {
+    // reset available colors
+    this.availableColors = colorSpectrum;
+
+    this.updatePeople();
+    this.updateTheme();
+  };
+
+  updatePeople() {
+    // this.people = $("#people-input").val().split('\n').filter(Boolean);
+    this.angle = 360 / people.length;
+    this.people = shuffle(people);
+  };
+
+  updateTheme() {
+    var theme = $('body').hasClass('dark-mode') ? themeColors.dark : themeColors.light;
+
+    this.textColor = theme.text;
+    this.borderColor = theme.stroke;
+  };
+
+  draw() {
+    this.people.forEach((person, index) => {
+      this.slices.push(this.drawSlice(person.name, index));
+      console.log(index)
+    });
+  };
+
+  getColor() {
+    let color = this.availableColors[Math.floor(Math.random() * this.availableColors.length)];
+
+    // remove the color from the available colors
+    this.availableColors = this.availableColors.filter(c => c !== color);
+    return color;
+  };
+
+  drawSlice(person, index) {
+    let startAngle = this.angle * index;
+    let endAngle = startAngle + this.angle;
+
+    let slice = new WheelSlice(startAngle, endAngle, this.radius, person, this.getColor());
+    slice.draw();
+    return slice;
+  };
+};
 
 $(document).ready(function() {
   // add all of the people to the text area
@@ -83,89 +262,31 @@ $(document).ready(function() {
     return names.join('\n');
   });
 
-  var buildWheel = function() {
-    const colorCache = [];
-    var randomColor = function() {
-      var color = spectrum[Math.floor(Math.random() * spectrum.length)];
-      return color;
-    };
+  var $wheel = $('#wheel');
+  var wheel = new Wheel(50);
+  wheel.init();
+  wheel.draw();
+  console.log(wheel.slices);
 
-    var createRoundedSlicePath = function(startAngle, endAngle, radius) {
-      // Convert angles from degrees to radians
-      startAngle = (startAngle * Math.PI) / 180;
-      endAngle = (endAngle * Math.PI) / 180;
-
-      // Calculate start and end points for the arc
-      const startX = radius + radius * Math.cos(startAngle);
-      const startY = radius + radius * Math.sin(startAngle);
-      const endX = radius + radius * Math.cos(endAngle);
-      const endY = radius + radius * Math.sin(endAngle);
-
-      // Use SVG arc to create the rounded effect
-      const largeArcFlag = endAngle - startAngle <= Math.PI ? "0" : "1";
-      const pathData = [`M ${radius},${radius} L ${startX},${startY} A ${radius},${radius} 0 ${largeArcFlag} 1 ${endX},${endY} Z`]
-
-      return pathData;
-    };
-
-    var createSlice = function(pathData, fillColor, sliceId, text) {
-      const svgNS = "http://www.w3.org/2000/svg";
-
-      // Create path element with jQuery, specifying namespace
-      const path = $(document.createElementNS(svgNS, "path"))
-        .attr("d", pathData)
-        .attr("id", `slice-${sliceId}`)
-        .attr("fill", fillColor);
-
-      const textPath = $(document.createElementNS(svgNS, "textPath"))
-        .attr("href", `#slice-${sliceId}`)
-        // .attr("startOffset", "50%")
-        .text(text);
-
-      const svgText = $(document.createElementNS(svgNS, "text"))
-        .append(textPath);
-
-      // Create SVG element with jQuery, specifying namespace
-      const svg = $(document.createElementNS(svgNS, "svg"))
-        .attr("viewBox", "0 0 200 200")
-        .addClass("slice")
-        .append(path)
-        .append(svgText);
-
-      return svg;
-    };
-
-    const $wheel = $('#wheel2');
-    const peopleArray = $("#people-input").val().split('\n').filter(Boolean);
-    const count = peopleArray.length;
-    const anglePerSlice = 360 / count;
-
-    $wheel.empty();
-
-    peopleArray.forEach((person, index) => {
-      const startAngle = anglePerSlice * index;
-      const endAngle = startAngle + anglePerSlice;
-      const pathData = createRoundedSlicePath(startAngle, endAngle, 100);
-      const slice = createSlice(pathData, randomColor(), index, person);
-      $wheel.append(slice);
-    });
-  };
+  wheel.slices.forEach(slice => {
+    $wheel.append(slice.content);
+  });
 
   // Event listener for the Go button to update the wheel
   $('#go-button').click(function() {
     buildWheel();
   });
 
-  $('#wheel2').click(function() {
+  $wheel.click(function() {
     $(this).css({
       animation: 'spin 4s linear',
     });
     setTimeout(() => {
-      $(this).css('animation', '');
+      $(this).css({animation: ''});
     }, 4000); // Reset animation
   });
 
-  buildWheel();
+  darkModeToggler();
 
   /*
   // show the checkboxes
@@ -199,7 +320,6 @@ $(document).ready(function() {
     $('#configure-people').hide();
     $('#people').show();
   });
-  */
 
   // hide the checkboxes and show the textarea
   $('#edit-button').click(function() {
@@ -209,8 +329,8 @@ $(document).ready(function() {
       .map(function() {
         return $(this).find('input').val();
       })
-      .get()
-      .map(buildName);
+      .get();
+      // .map(buildName); // TODO
 
     // Show the configure div and hide the people list
     $('#configure-people').show();
@@ -271,281 +391,13 @@ $(document).ready(function() {
   setTimeout(function () {
     window.scrollTo(0, 1);
   }, 0);
-
-  darkModeToggler();
+  */
 });
 
-var baseColors = {
-  white: '#ffffff',
-  gray_1: '#444444',
-  gray_2: '#222222',
-  black: '#000000',
-};
-
-var themeColors = {
-  dark: {
-    fill: baseColors.white,
-    stroke: baseColors.gray_1,
-    text: baseColors.white,
-  },
-  light: {
-    fill: baseColors.gray_2,
-    stroke: baseColors.gray_2,
-    text: baseColors.black,
-  },
-}
-
-var wheel = {
-  angleCurrent: 0,
-  angleDelta: 0,
-  canvasContext: null,
-  centerX: 50,
-  centerY: 50,
-  bullseyeSize: 10,
-  colorCache: [],
-  downTime: 2000,
-  frames: 0,
-  maxSpeed: Math.PI / 16,
-  segments: [],
-  size: 100,
-  spinStart: 0,
-  timerDelay: 33,
-  timerHandle: 0,
-  upTime: 1000,
-  fillColor: null,
-  strokeColor: null,
-  textColor: null,
-
-  wheelLocation: function() {
-    var $wheel = document.getElementById('canvas');
-
-    wheel.centerX = $wheel.width / 3;
-    wheel.centerY = $wheel.height / 2;
-    wheel.size = Math.min($wheel.height, $wheel.width) / 2 - wheel.bullseyeSize;
-  },
-
-  spin: function () {
-    // Start the wheel only if it's not already spinning
-    if (wheel.timerHandle == 0) {
-      wheel.spinStart = new Date().getTime();
-      wheel.maxSpeed = Math.PI / (16 + (Math.random() * 10)); // Randomly vary how hard the spin is
-      wheel.frames = 0;
-      wheel.timerHandle = setInterval(wheel.onTimerTick, wheel.timerDelay);
-    }
-  },
-
-  onTimerTick: function () {
-    wheel.frames++;
-    wheel.draw();
-
-    var duration = (new Date().getTime() - wheel.spinStart);
-    var progress = 0;
-    var finished = false;
-
-    if (duration < wheel.upTime) {
-      progress = duration / wheel.upTime;
-      wheel.angleDelta = wheel.maxSpeed * Math.sin(progress * Math.PI / 2);
-    }
-    else {
-      progress = duration / wheel.downTime;
-      wheel.angleDelta = wheel.maxSpeed * Math.sin(progress * Math.PI / 2 + Math.PI / 2);
-
-      if (progress >= 1) {
-        finished = true;
-      }
-    }
-
-    wheel.angleCurrent += wheel.angleDelta;
-    while (wheel.angleCurrent >= Math.PI * 2) {
-      // Keep the angle in a reasonable range
-      wheel.angleCurrent -= Math.PI * 2;
-    }
-
-    if (finished) {
-      clearInterval(wheel.timerHandle);
-      wheel.timerHandle = 0;
-      wheel.angleDelta = 0;
-    }
-  },
-
-  init: function (optionList) {
-    try {
-      wheel.initWheel();
-      wheel.initCanvas();
-      wheel.setTheme();
-      wheel.draw();
-      $.extend(wheel, optionList);
-    } catch (exceptionData) {
-      // alert('Wheel is not loaded ' + exceptionData);
-    }
-  },
-
-  initWheel: function () {
-    shuffle(spectrum);
-  },
-
-  initCanvas: function () {
-    var canvas = $('#canvas').get(0);
-    canvas.addEventListener('click', wheel.spin, false);
-    wheel.canvasContext = canvas.getContext('2d');
-  },
-
-  setTheme: function() {
-    var theme = $('body').hasClass('dark-mode') ? themeColors.dark : themeColors.light;
-
-    wheel.fillColor = theme.fill;
-    wheel.strokeColor = theme.stroke;
-    wheel.textColor = theme.text;
-  },
-
-  update: function () {
-    // Ensure we start mid way on a item
-    var r = Math.floor(Math.random() * wheel.segments.length);
-    wheel.angleCurrent = ((r + 0.5) / wheel.segments.length) * Math.PI * 2;
-
-    var segments = wheel.segments;
-    var len = segments.length;
-    var colorLen = spectrum.length;
-
-    var colorCache = [];
-    for (var i = 0; i < len; i++) {
-      var color = spectrum[mod(hashCode(segments[i]), colorLen)];
-      colorCache.push(color);
-    }
-    wheel.colorCache = colorCache;
-    wheel.draw();
-  },
-
-  draw: function () {
-    wheel.setTheme();
-    wheel.clear();
-    wheel.drawWheel();
-    wheel.drawNeedle();
-  },
-
-  clear: function () {
-    var $canvas = $('#canvas');
-    var ctx = wheel.canvasContext;
-    ctx.clearRect(0, 0, $canvas.width(), $canvas.height());
-  },
-
-  drawNeedle: function () {
-    var ctx = wheel.canvasContext;
-    var centerX = wheel.centerX;
-    var centerY = wheel.centerY;
-    var size = wheel.size;
-
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = wheel.strokeColor;
-    ctx.fillStyle = wheel.fillColor;
-
-    ctx.beginPath();
-
-    ctx.moveTo(centerX + size - wheel.bullseyeSize / 2, centerY);
-    ctx.lineTo(centerX + size + wheel.bullseyeSize * 2, centerY - wheel.bullseyeSize);
-    ctx.lineTo(centerX + size + wheel.bullseyeSize * 2, centerY + wheel.bullseyeSize);
-    ctx.closePath();
-
-    ctx.stroke();
-    ctx.fill();
-
-    // Which segment is being pointed to?
-    var i = wheel.segments.length - Math.floor((wheel.angleCurrent / (Math.PI * 2)) * wheel.segments.length) - 1;
-
-    // Now draw the winning name
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'middle';
-    ctx.fillStyle = wheel.textColor;
-    ctx.font = '1rem Arial';
-    ctx.fillText(wheel.segments[i], centerX + size + wheel.bullseyeSize * 2.5, centerY);
-  },
-
-  drawSegment: function (key, lastAngle, angle) {
-    var ctx = wheel.canvasContext;
-    var centerX = wheel.centerX;
-    var centerY = wheel.centerY;
-    var size = wheel.size;
-    var value = wheel.segments[key];
-
-    ctx.save();
-    ctx.beginPath();
-
-    // Start in the centre
-    ctx.moveTo(centerX, centerY);
-    ctx.arc(centerX, centerY, size, lastAngle, angle, false); // Draw a arc around the edge
-    ctx.lineTo(centerX, centerY); // Now draw a line back to the centre
-    // Clip anything that follows to this area
-    //ctx.clip(); // It would be best to clip, but we can double performance without it
-    ctx.closePath();
-
-    ctx.fillStyle = wheel.colorCache[key];
-    ctx.fill();
-    ctx.stroke();
-
-    // Now draw the text
-    ctx.save(); // The save ensures this works on Android devices
-    ctx.translate(centerX, centerY);
-    ctx.rotate((lastAngle + angle) / 2);
-
-    ctx.fillStyle = wheel.textColor;
-    ctx.font = '8px Arial';
-    ctx.fillText(value.substr(0, 20), size / 2 + wheel.bullseyeSize, 0);
-    ctx.restore();
-
-    ctx.restore();
-  },
-
-  drawWheel: function () {
-    wheel.wheelLocation();
-
-    var ctx = wheel.canvasContext;
-
-    var angleCurrent = wheel.angleCurrent;
-    var lastAngle = angleCurrent;
-
-    var len = wheel.segments.length;
-
-    var centerX = wheel.centerX;
-    var centerY = wheel.centerY;
-    var size = wheel.size;
-
-    var PI2 = Math.PI * 2;
-
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = wheel.strokeColor;
-    ctx.textBaseline = 'middle';
-    ctx.textAlign = 'center';
-    ctx.font = '1rem Arial';
-
-    for (var i = 1; i <= len; i++) {
-      var angle = PI2 * (i / len) + angleCurrent;
-      wheel.drawSegment(i - 1, lastAngle, angle);
-      lastAngle = angle;
-    }
-    // Draw a center circle
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, 10, 0, PI2, false);
-    ctx.closePath();
-
-    ctx.fillStyle = wheel.fillColor;
-    ctx.strokeStyle = wheel.strokeColor;
-    ctx.fill();
-    ctx.stroke();
-
-    // Draw outer circle
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, size, 0, PI2, false);
-    ctx.closePath();
-
-    ctx.lineWidth = 10;
-    ctx.strokeStyle = wheel.strokeColor;
-    ctx.stroke();
-  }
-};
-
 var spectrum = ['#A2395B', '#A63552', '#AA3149', '#AE2D40', '#B22937', '#A23A53', '#924B6F', '#825C8B', '#6F6DA7', '#A63570', '#AC2F5A', '#B22944', '#B8232E', '#C11C17', '#A72A37', '#8D3857', '#734677', '#575597', '#A6358C', '#B43B6A', '#C24148', '#D04726', '#DE5003', '#B84D24', '#924A45', '#6C4766', '#434187', '#A650A0', '#B55A80', '#C46460', '#D36E40', '#E27A1D', '#B26331', '#824C45', '#523559', '#1F1D6D', '#A660AC', '#B67288', '#C68464', '#D69640', '#E6AA19', '#BC892E', '#926843', '#684758', '#3B256D', '#A670B8', '#B8878E', '#CA9E64', '#DCB53A', '#EFCE10', '#C8A628', '#A17E40', '#7A5658', '#502E72', '#80529A', '#98777A', '#B09C5A', '#C8C13A', '#E0E61A', '#C8C13A', '#B09C5A', '#98777A', '#80529A', '#502E72', '#675860', '#7E824E', '#95AC3C', '#ACD62A', '#ABBD4D', '#AAA470', '#A98B93', '#A670B8', '#3B256D', '#4C4D60', '#5D7553', '#6E9D46', '#80C837', '#89AE54', '#929471', '#9B7A8E', '#A660AC', '#1F1D6D', '#2A3F5D', '#35614D', '#40833D', '#4CA82B', '#629248', '#787C65', '#8E6682', '#A650A0', '#434187', '#3B536E', '#336555', '#2B773C', '#228B22', '#43763C', '#646156', '#854C70', '#A6358C', '#575597', '#4A678D', '#3D7983', '#308B79', '#229F6E', '#43856E', '#646B6E', '#85516E', '#A63570', '#6F6DA7', '#5C7EA7', '#498FA7', '#36A0A7', '#20B2AA', '#409497', '#607684', '#805871', '#A2395B', '#7F91C3', '#789AC4', '#71A3C5', '#6AACC6', '#60B6CA', '#7493A6', '#887082', '#9C4D5E', '#B22937', '#71A3C5', '#79A9CD', '#81AFD5', '#89B5DD', '#93BDE7', '#9E95B3', '#A96D7F', '#B4454B', '#C11C17', '#60B6CA', '#67ADC9', '#6EA4C8', '#759BC7', '#7F91C3', '#968193', '#AD7163', '#C46133', '#DE5003', '#20B2AA', '#33A1AA', '#4690AA', '#597FAA', '#6F6DA7', '#8B7085', '#A77363', '#C37641', '#E27A1D', '#229F6E', '#2F8D78', '#3C7B82', '#49698C', '#575597', '#7A6A78', '#9D7F59', '#C0943A', '#E6AA19', '#228B22', '#2A793B', '#326754', '#3A556D', '#434187', '#6E646A', '#99874D', '#C4AA30', '#EFCE10', '#4CA82B', '#41863B', '#36644B', '#2B425B', '#1F1D6D', '#4F4F58', '#808244', '#B0B42F', '#E0E61A', '#80C837', '#6FA044', '#5E7851', '#4D505E', '#3B256D', '#57515C', '#747E4C', '#90AA3B', '#ACD62A'];
+var colorSpectrum = Object.freeze(spectrum);
 
-$(window).resize(wheel.update);
+// $(window).resize(wheel.update);
 
 /** Toggles between light and dark mode */
 var darkModeToggler = function() {
@@ -555,13 +407,13 @@ var darkModeToggler = function() {
 
   function applyDarkMode() {
     $('body').addClass(darkThemeClass);
-    wheel.draw();
+    // wheel.draw();
     localStorage.setItem('theme', darkThemeClass);
   }
 
   function removeDarkMode() {
     $('body').removeClass(darkThemeClass);
-    wheel.draw();
+    // wheel.draw();
     localStorage.setItem('theme', lightThemeClass);
   }
 

@@ -147,40 +147,17 @@ body .wrapper section.left .footer .view li::before {
 body .wrapper section.right {
   width: 75%;
 }
-body .wrapper section.right #canvas {
-  width: 100%;
-  border: 1px solid var(--border-color);
-  border-radius: 5px;
-}
-body .wrapper section.right .wheel-container {
-  height: 100%;
+body .wrapper section.right #wheel {
+  width: 50%;
   position: relative;
-  display: block;
 }
-body .wrapper section.right #wheel2 {
-  position: relative;
-  --radius: 10rem;
-  left: 10vw;
-  top: 10vh;
-  width: calc(var(--radius) * 2);
-  height: calc(var(--radius) * 2);
-  border: 4px solid var(--text-color);
-  border-radius: 50%;
-}
-body .wrapper section.right #wheel2 svg text {
-  font: 1rem sans-serif;
-  color: var(--text-color);
-  start-offset: 50%;
-}
-body .wrapper section.right #wheel2 .slice {
+body .wrapper section.right #wheel .wheel-slice {
   position: absolute;
   z-index: 1;
-  text-align: center;
-  vertical-align: middle;
 }
 body .wrapper section .content {
   height: 100%;
 }
-body #people, body #wheel {
+body #people {
   display: none;
 }

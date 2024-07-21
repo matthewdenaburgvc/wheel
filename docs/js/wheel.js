@@ -72,7 +72,7 @@ people = people.map(buildName);
 $(document).ready(function() {
   // add all of the people to the text area
   $('#people-input').val(function () {
-    var names = []
+    var names = [];
 
     // Iterate over the people array to extract names
     for (var i = 0; i < people.length; i++) {
@@ -83,6 +83,91 @@ $(document).ready(function() {
     return names.join('\n');
   });
 
+  var buildWheel = function() {
+    const colorCache = [];
+    var randomColor = function() {
+      var color = spectrum[Math.floor(Math.random() * spectrum.length)];
+      return color;
+    };
+
+    var createRoundedSlicePath = function(startAngle, endAngle, radius) {
+      // Convert angles from degrees to radians
+      startAngle = (startAngle * Math.PI) / 180;
+      endAngle = (endAngle * Math.PI) / 180;
+
+      // Calculate start and end points for the arc
+      const startX = radius + radius * Math.cos(startAngle);
+      const startY = radius + radius * Math.sin(startAngle);
+      const endX = radius + radius * Math.cos(endAngle);
+      const endY = radius + radius * Math.sin(endAngle);
+
+      // Use SVG arc to create the rounded effect
+      const largeArcFlag = endAngle - startAngle <= Math.PI ? "0" : "1";
+      const pathData = [`M ${radius},${radius} L ${startX},${startY} A ${radius},${radius} 0 ${largeArcFlag} 1 ${endX},${endY} Z`]
+
+      return pathData;
+    };
+
+    var createSlice = function(pathData, fillColor, sliceId, text) {
+      const svgNS = "http://www.w3.org/2000/svg";
+
+      // Create path element with jQuery, specifying namespace
+      const path = $(document.createElementNS(svgNS, "path"))
+        .attr("d", pathData)
+        .attr("id", `slice-${sliceId}`)
+        .attr("fill", fillColor);
+
+      const textPath = $(document.createElementNS(svgNS, "textPath"))
+        .attr("href", `#slice-${sliceId}`)
+        // .attr("startOffset", "50%")
+        .text(text);
+
+      const svgText = $(document.createElementNS(svgNS, "text"))
+        .append(textPath);
+
+      // Create SVG element with jQuery, specifying namespace
+      const svg = $(document.createElementNS(svgNS, "svg"))
+        .attr("viewBox", "0 0 200 200")
+        .addClass("slice")
+        .append(path)
+        .append(svgText);
+
+      return svg;
+    };
+
+    const $wheel = $('#wheel2');
+    const peopleArray = $("#people-input").val().split('\n').filter(Boolean);
+    const count = peopleArray.length;
+    const anglePerSlice = 360 / count;
+
+    $wheel.empty();
+
+    peopleArray.forEach((person, index) => {
+      const startAngle = anglePerSlice * index;
+      const endAngle = startAngle + anglePerSlice;
+      const pathData = createRoundedSlicePath(startAngle, endAngle, 100);
+      const slice = createSlice(pathData, randomColor(), index, person);
+      $wheel.append(slice);
+    });
+  };
+
+  // Event listener for the Go button to update the wheel
+  $('#go-button').click(function() {
+    buildWheel();
+  });
+
+  $('#wheel2').click(function() {
+    $(this).css({
+      animation: 'spin 4s linear',
+    });
+    setTimeout(() => {
+      $(this).css('animation', '');
+    }, 4000); // Reset animation
+  });
+
+  buildWheel();
+
+  /*
   // show the checkboxes
   $('#go-button').click(function() {
     var inputNames = $('#people-input').val().split('\n');
@@ -94,10 +179,11 @@ $(document).ready(function() {
 
         var $li = $('<li/>');
         var $checkbox = $('<input/>', {
-          type: 'checkbox',
           id: 'name_' + hash, // Ensure unique ID
+          name: name,
+          value: name,
+          type: 'checkbox',
           checked: true,
-          value: name
         });
         var $label = $('<label/>', {
           for: 'name_' + hash,
@@ -113,8 +199,9 @@ $(document).ready(function() {
     $('#configure-people').hide();
     $('#people').show();
   });
+  */
 
-  // hide the checkboxes and hsow the textarea
+  // hide the checkboxes and show the textarea
   $('#edit-button').click(function() {
     var $list = $("#people ul li");
 
@@ -133,9 +220,10 @@ $(document).ready(function() {
   var peopleContainer = $('#people ul');
   people.forEach(function (person) {
     var name = person.name;
+
     peopleContainer.append(
-      $(document.createElement('li')).append(
-        $(document.createElement('input')).attr({
+      $('<li/>').append(
+        $('<input/>').attr({
           id: 'name_' + hashCode(name),
           name: name,
           value: name,
@@ -189,25 +277,20 @@ $(document).ready(function() {
 
 var baseColors = {
   white: '#ffffff',
-  gray_1: '#f0f0f0',
-  gray_2: '#cccccc',
-  gray_3: '#aaaaaa',
-  gray_4: '#888888',
-  gray_5: '#666666',
-  gray_6: '#444444',
-  gray_7: '#222222',
+  gray_1: '#444444',
+  gray_2: '#222222',
   black: '#000000',
 };
 
 var themeColors = {
   dark: {
     fill: baseColors.white,
-    stroke: baseColors.gray_6,
+    stroke: baseColors.gray_1,
     text: baseColors.white,
   },
   light: {
-    fill: baseColors.gray_7,
-    stroke: baseColors.gray_7,
+    fill: baseColors.gray_2,
+    stroke: baseColors.gray_2,
     text: baseColors.black,
   },
 }
@@ -234,7 +317,7 @@ var wheel = {
   textColor: null,
 
   wheelLocation: function() {
-    var $wheel = document.getElementById('canvas');;
+    var $wheel = document.getElementById('canvas');
 
     wheel.centerX = $wheel.width / 3;
     wheel.centerY = $wheel.height / 2;
@@ -262,9 +345,11 @@ var wheel = {
     if (duration < wheel.upTime) {
       progress = duration / wheel.upTime;
       wheel.angleDelta = wheel.maxSpeed * Math.sin(progress * Math.PI / 2);
-    } else {
+    }
+    else {
       progress = duration / wheel.downTime;
       wheel.angleDelta = wheel.maxSpeed * Math.sin(progress * Math.PI / 2 + Math.PI / 2);
+
       if (progress >= 1) {
         finished = true;
       }
@@ -291,7 +376,7 @@ var wheel = {
       wheel.draw();
       $.extend(wheel, optionList);
     } catch (exceptionData) {
-      alert('Wheel is not loaded ' + exceptionData);
+      // alert('Wheel is not loaded ' + exceptionData);
     }
   },
 
@@ -306,8 +391,7 @@ var wheel = {
   },
 
   setTheme: function() {
-    var $body = $('body');
-    var theme = $body.hasClass('dark-mode') ? themeColors.dark : themeColors.light;
+    var theme = $('body').hasClass('dark-mode') ? themeColors.dark : themeColors.light;
 
     wheel.fillColor = theme.fill;
     wheel.strokeColor = theme.stroke;
@@ -431,7 +515,7 @@ var wheel = {
     ctx.strokeStyle = wheel.strokeColor;
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
-    ctx.font = '1.4rem Arial';
+    ctx.font = '1rem Arial';
 
     for (var i = 1; i <= len; i++) {
       var angle = PI2 * (i / len) + angleCurrent;

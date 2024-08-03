@@ -1,10 +1,14 @@
 /**
+ * @file wheel.js
+ */
+
+/**
  * Randomly shuffles the elements in an array in place.
  *
  * @param {Array} objects The array to be shuffled.
  * @returns {Array} The shuffled array.
  */
-var shuffle = function(objects) {
+const shuffle = function(objects) {
   var jdx, item;
 
   // Loop over the array in reverse order
@@ -21,47 +25,10 @@ var shuffle = function(objects) {
   return objects;
 };
 
-/**
- * Hash a string to a 32-bit integer
- *
- * @param {string} string the string to hash
- * @returns {number} the hash code of the string
- */
-var hashCode = function (string) {
-  // See http://www.cse.yorku.ca/~oz/hash.html
-  var hash = 97;
-
-  for (i = 0; i < string.length; i++) {
-    var char = string.charCodeAt(i);
-    hash = ((hash << 5) + hash) + char;
-    hash = hash & hash; // Convert to 32bit integer
-  }
-  return hash;
-};
-
-/**
- * Calculates the modulo of two numbers.
- *
- * @param {number} a The dividend.
- * @param {number} b The divisor.
- * @returns {number} The modulo of `a` and `b`.
- */
-var mod = function (a, b) {
-  return ((a % b) + b) % b;
-};
-
-var buildPerson = function(name) {
-  return {
-    id: "id_" + hashCode(name),
-    name: name,
-    hash: hashCode(name),
-  };
-};
-
 var people = (function() {
   let res = [];
   for (let i = 1; i <= 8; i++) {
-    res.push(buildPerson(`Person ${i}`));
+    res.push(new Person(`Person ${i}`));
   }
   return res;
 })();
@@ -127,9 +94,9 @@ $(document).ready(function() {
     return names.join('\n');
   });
 
-  const $wheel2 = $('#wheel2');
+  const $wheel = $('#wheel');
   const usedColors = [];
-  let wheelAngle = 0;
+  let wheelCurrentAngle = 0;
 
   const randomColor = function() {
     const color = colorSpectrum[Math.floor(Math.random() * colorSpectrum.length)];
@@ -146,7 +113,7 @@ $(document).ready(function() {
     const names = $peopleInput.val().split('\n').filter(Boolean);
     const numSlices = names.length;
     const angle = 360 / numSlices;
-    $wheel2.empty();
+    $wheel.empty();
 
     names.forEach((name, index) => {
       const $slice = $("<div>")
@@ -158,28 +125,28 @@ $(document).ready(function() {
         });
         const $text = $("<span>").text(name);
       $slice.append($text);
-      $wheel2.append($slice);
+      $wheel.append($slice);
     });
   }
 
   const makeWheelSquare = function() {
-    var parentWidth = $wheel2.parent().width();
-    var parentHeight = $wheel2.parent().height();
+    var parentWidth = $wheel.parent().width();
+    var parentHeight = $wheel.parent().height();
     var size = Math.min(parentWidth, parentHeight);
-    $wheel2.css({
+    $wheel.css({
       width: size + 'px',
       height: size + 'px'
     });
   }
 
   const spinWheel = function() {
-    wheelAngle += Math.floor(Math.random() * 360) + Math.floor(Math.random() * 2 + 1) * 360;
-    $wheel2.css({
+    wheelCurrentAngle += Math.floor(Math.random() * 360) + Math.floor(Math.random() * 2 + 1) * 360;
+    $wheel.css({
       transition: 'transform 1s ease-out',
-      transform: `rotate(${wheelAngle}deg)`,
+      transform: `rotate(${wheelCurrentAngle}deg)`,
     });
     setTimeout(() => {
-      $wheel2.css({transition: ''});
+      $wheel.css({transition: ''});
     }, 4000); // Reset animation
   }
 
@@ -187,7 +154,7 @@ $(document).ready(function() {
   makeWheelSquare();
   darkModeToggler();
 
-  $wheel2.click(spinWheel);
+  $wheel.click(spinWheel);
   // Event listener for the Go button to update the wheel
   $('#go-button').click(createWheelSlices);
   $(window).resize(makeWheelSquare);

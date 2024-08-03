@@ -8,7 +8,7 @@ MVP:
 
 - [ ] upload person list
 - [ ] templates for uploading
-- [ ] change color scheme (dark vs light mode)
+- [x] change color scheme (dark vs light mode)
 
 Fast Followers:
 
@@ -21,4 +21,3 @@ Fast Followers:
 ## Credits
 
 - Based on [`inlinestyle/wheel`](https://github.com/inlinestyle/wheel)
-- Dark styles based on [`yrgoldteeth/darkdowncss`](https://github.com/yrgoldteeth/darkdowncss)

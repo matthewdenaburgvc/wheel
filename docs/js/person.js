@@ -10,7 +10,7 @@ class Person {
     this.active = Boolean(active);
 
     Person.#people.set(name, this);
-  };
+  }
 
   toString() {
     return this.name;
@@ -19,6 +19,6 @@ class Person {
   static getPeople() {
     return Array.from(Person.#people.values());
   }
-};
+}
 
 export default Person;

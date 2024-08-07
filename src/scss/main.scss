@@ -183,7 +183,7 @@ body {
         padding-left: 2vw;
         width: 75%;
 
-        #wheel {
+        #wheel-container {
           position: relative;
 
           width: 100%;
@@ -191,36 +191,56 @@ body {
           max-width: 600px;
           max-height: 600px;
 
-          border-radius: 50%;
-          // overflow: clip;
+          #wheel {
+            position: relative;
 
-          border: 1px solid var(--border-color);
-
-          transform-origin: center;
-
-          .slice {
-            transform-origin: 50% 50%;
-            border-right: 3px solid var(--border-color);
-            position: absolute;
             width: 100%;
             height: 100%;
-            // clip-path: polygon(0 0, 100% 0, 100% 100%);
 
-            span {
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+
+            overflow: hidden;
+
+            .slice {
               position: absolute;
+              // border: 3px solid var(--border-color);
 
-              top: 75%;
-              left: 100%;
+              width: 100%;
+              height: 100%;
 
-              transform: translate(-50%, -50%) rotate(-90deg);
-              transform-origin: 0 0;
-              white-space: nowrap;
-
-              &.dark {
-                color: #fff;
+              .part-1, .part-2 {
+                position: absolute;
+                width: 100%;
+                height: 100%;
               }
-              &.light {
-                color: #000;
+              .part-1 {
+                // border: 3px solid var(--border-color);
+                clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%);
+              }
+              .part-2 {
+                clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%);
+              }
+
+              padding: 0;
+              margin: 0;
+
+              span {
+                position: absolute;
+
+                top: 75%;
+                left: 100%;
+
+                transform: translate(-50%, -50%) rotate(-90deg);
+                transform-origin: 0 0;
+                white-space: nowrap;
+
+                &.dark {
+                  color: #fff;
+                }
+                &.light {
+                  color: #000;
+                }
               }
             }
           }

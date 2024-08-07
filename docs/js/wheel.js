@@ -6,7 +6,7 @@ class Wheel {
   static #alreadyLoaded = false;
   static #peopleInput = $("#people-input");
 
-  constructor(reuseColors = false) {
+  constructor(radius = 50, reuseColors = false) {
     this.reuseColors = reuseColors;
 
     this.wheel = null;
@@ -14,13 +14,14 @@ class Wheel {
     this.currentAngle = 90;
     this.sliceCount = 0;
 
-    this.diameter = 250;
+    // this.diameter = 250;
+    this.radius = radius;
   };
 
   init() {
     if (!Wheel.#alreadyLoaded) {
       this.wheel = $('<div>').attr('id', 'wheel');
-      this.wheel.appendTo("#wheel-container");
+      $("#wheel-container").append(this.wheel);
     }
 
     this.load().then(() => {
@@ -31,6 +32,8 @@ class Wheel {
     $(window).resize(this.resize.bind(this));
 
     Wheel.#alreadyLoaded = true;
+
+    return this;
   };
 
   async load() {
@@ -44,17 +47,21 @@ class Wheel {
   draw() {
     this.resize();
     this.createSlices();
+
+    return this;
   };
 
   resize() {
     var parentWidth = this.wheel.parent().width();
     var parentHeight = this.wheel.parent().height();
-    this.diameter = Math.min(parentWidth, parentHeight);
+    this.radius = Math.min(parentWidth, parentHeight);
 
     this.wheel.css({
-      width: this.diameter + 'px',
-      height: this.diameter + 'px'
+      width: this.radius + 'px',
+      height: this.radius + 'px'
     });
+
+    return this;
   };
 
   randomColor() {
@@ -76,78 +83,53 @@ class Wheel {
   createSlices() {
     const people = Person.getPeople();
     this.sliceCount = people.length;
+    const angleStep = 360 / this.sliceCount;
 
-    const angle = 360 / this.sliceCount;
     this.wheel.empty();
 
+    const polygon = new Polygon(this.sliceCount, this.radius).draw();
+
     people.forEach((person, index) => {
-      [1].forEach(sliceHalf => {
-        const backgroundColor = this.randomColor();
-        const $slice = $('<div>')
-          .addClass('slice')
-          .css({
-            backgroundColor: backgroundColor,
-            // transform: `rotate(${angle * index}deg)`,
-            zIndex: sliceHalf === 1 ? 1 : 0,
-            clipPath: this.calculateClipPath(sliceHalf),
-          });
+      // const backgroundColor = this.randomColor();
+      const backgroundColor = `hsl(${index * angleStep}, 100%, 45%)`; // Example color
 
+      // const index1 = index % this.sliceCount;
+      // const index2 = (index + 1) % this.sliceCount;
+      // console.log(`${index}: slice ${index1} and ${index2}`);
 
-        if (sliceHalf === 1) {
-          const $text = $('<span>')
-            .addClass(backgroundColor.isDark ? 'dark' : 'light')
-            .text(person);
-          $slice.append($text);
-        }
-        this.wheel.append($slice);
-      });
-
-      /*
-      const $slice = $('<div>')
+      let $slice = $('<div>')
         .addClass('slice')
         .css({
-          backgroundColor: backgroundColor,
-          transform: `rotate(${angle * index}deg)`,
-          zIndex: 1,
-          clipPath: this.calculateClipPath(),
-
+          clipPath: polygon.toString(),
+          transform: `rotate(${index * angleStep}deg)`,
         });
-      const $text = $('<span>')
+      // under the next slice
+      let part1 = $('<div>')
+        .addClass('part-1')
         .addClass(backgroundColor.isDark ? 'dark' : 'light')
-        .text(person);
+        .text(person)
+        .css({
+          backgroundColor: backgroundColor,
+          zIndex: index % this.sliceCount,
+        });
+      // over the previous slice
+      let part2 = $('<div>')
+        .addClass('part-2')
+        .css({
+          backgroundColor: backgroundColor,
+          zIndex: (index + 1) % this.sliceCount,
+        });
 
-      $slice.append($text);
+      // $slice.append(part2);
+      $slice.append(part1);
+
+      // const $text = $('<span>')
+      //   .addClass('dark')
+      //   .text(person);
+      // part1.append($text);
+
       this.wheel.append($slice);
-      */
     });
-  };
-
-  calculateClipPath(sliceHalf) {
-    const radius = this.diameter / 2;
-    const angle = 360 / this.sliceCount;
-    // const cornerLoc = 100 / this.sliceCount;
-    const radiusPercent = radius / this.diameter * 100;
-
-    // Convert angle to radians for Math.tan
-    const y = radius * Math.tan((angle / 2) * (Math.PI / 180));
-    const yPercent = y / this.diameter * 100;
-
-    // const percentString =
-    const coordinates = [
-      // start at the center of the circle
-      {x: `${radiusPercent}%`, y: `${radiusPercent}%`},
-      // go straight up to the edge of the circle
-      {x: `${radiusPercent}%`, y: '0%'},
-      {x: 0, y: 0},
-      {x: 0, y: `${yPercent}%`},
-    ];
-
-    return `polygon(
-      ${coordinates[0].x} ${coordinates[0].y},
-      ${coordinates[1].x} ${coordinates[1].y},
-      ${coordinates[2].x} ${coordinates[2].y},
-      ${coordinates[3].x} ${coordinates[3].y}
-    )`;
   };
 
   spin() {

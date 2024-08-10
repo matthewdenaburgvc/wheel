@@ -15,7 +15,7 @@ class Wheel {
     this.sliceCount = 0;
 
     // this.diameter = 250;
-    this.radius = radius;
+    this.radius = 100;
   };
 
   init() {
@@ -90,41 +90,26 @@ class Wheel {
     const polygon = new Polygon(this.sliceCount, this.radius).draw();
 
     people.forEach((person, index) => {
-      // const backgroundColor = this.randomColor();
+      if (index != 1) {
+        return;
+      }
       const backgroundColor = `hsl(${index * angleStep}, 100%, 45%)`; // Example color
-
-      // const index1 = index % this.sliceCount;
-      // const index2 = (index + 1) % this.sliceCount;
-      // console.log(`${index}: slice ${index1} and ${index2}`);
 
       let $slice = $('<div>')
         .addClass('slice')
         .css({
-          clipPath: polygon.toString(),
-          transform: `rotate(${index * angleStep}deg)`,
-        });
-      // under the next slice
-      let part1 = $('<div>')
-        .addClass('part-1')
-        .addClass(backgroundColor.isDark ? 'dark' : 'light')
-        .text(person)
-        .css({
+          clipPath: polygon.toPolygonString(index),
           backgroundColor: backgroundColor,
-          zIndex: index % this.sliceCount,
-        });
-      // over the previous slice
-      let part2 = $('<div>')
-        .addClass('part-2')
-        .css({
-          backgroundColor: backgroundColor,
-          zIndex: (index + 1) % this.sliceCount,
         });
 
-      // $slice.append(part2);
-      $slice.append(part1);
-
+      if ([1, 3,7].includes(index)) {
+        console.log(`angle: ${polygon.polygons[index][1].angle}`);
+        polygon.polygons[index].forEach((point, i) => {
+          console.log(`${i}: ${point.x}, ${point.y}, ${point.angle}`);
+        });
+      }
       // const $text = $('<span>')
-      //   .addClass('dark')
+      //   .addClass(backgroundColor.isDark ? 'dark' : 'light')
       //   .text(person);
       // part1.append($text);
 

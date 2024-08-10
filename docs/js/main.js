@@ -1,6 +1,4 @@
-import Polygon from "./polygon.js";
 import Wheel from "./wheel.js";
-// import Person from "./person.js";
 
 
 /**
@@ -81,7 +79,7 @@ const darkModeToggler = function() {
 
 $(document).ready(function() {
   const names = []
-  for (let i = 1; i <= 7; i++) {
+  for (let i = 1; i <= 4; i++) {
     names.push(`Person ${i}`);
   }
   $(`#people-input`).val(names.join('\n'));

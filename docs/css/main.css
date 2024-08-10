@@ -162,7 +162,6 @@ body .wrapper section.right #wheel-container #wheel {
   height: 100%;
   border: 1px solid var(--border-color);
   border-radius: 50%;
-  overflow: hidden;
 }
 body .wrapper section.right #wheel-container #wheel .slice {
   position: absolute;
@@ -170,17 +169,6 @@ body .wrapper section.right #wheel-container #wheel .slice {
   height: 100%;
   padding: 0;
   margin: 0;
-}
-body .wrapper section.right #wheel-container #wheel .slice .part-1, body .wrapper section.right #wheel-container #wheel .slice .part-2 {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-}
-body .wrapper section.right #wheel-container #wheel .slice .part-1 {
-  clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%);
-}
-body .wrapper section.right #wheel-container #wheel .slice .part-2 {
-  clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%);
 }
 body .wrapper section.right #wheel-container #wheel .slice span {
   position: absolute;

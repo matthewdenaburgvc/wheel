@@ -7,27 +7,98 @@ class Color {
    * @param {string} color the color - hex or rgb.
    */
   constructor(color) {
-    this.hex = this.#toHex(color);
+    this.hex = this.toHex(color);
     this.isDark = this.isDark();
 
   };
+
+  fromRGB(color) {
+    const rgb = color.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+(?:\.\d+)?))?\)$/);
+    let r, g, b;
+    r = parseInt(rgb[1]);
+    g = parseInt(rgb[2]);
+    b = parseInt(rgb[3]);
+
+    return Color.fromRGBHelper(r, g, b);
+  }
+
+  /**
+   * Convert HSL color to RGB.
+   * @param {string} color - The HSL color string.
+   * @returns {string} The RGB color string.
+   * @see https://en.wikipedia.org/wiki/HSL_and_HSV#HSL_to_RGB
+   */
+  fromHSL(color) {
+    const hsl = color.match(/^hsl\((\d+),\s*(\d+)%,\s*(\d+)%/);
+    const h = parseInt(hsl[1]);
+    const s = parseInt(hsl[2]) / 100;
+    const l = parseInt(hsl[3]) / 100;
+
+    // chroma
+    const c = (1 - Math.abs(2 * l - 1)) * s;
+    const hPrime = h / 60;
+    // intermediate value
+    const x = c * (1 - Math.abs(hPrime % 2 - 1));
+    // match lightness
+    const m = l - c / 2;
+
+    let r, g, b;
+    if (hPrime <= 1) {
+      r = c;
+      g = x;
+      b = 0;
+    }
+    else if (hPrime <= 2) {
+      r = x;
+      g = c;
+      b = 0;
+    }
+    else if (hPrime <= 3) {
+      r = 0;
+      g = c;
+      b = x;
+    }
+    else if (hPrime <= 4) {
+      r = 0;
+      g = x;
+      b = c;
+    }
+    else if (hPrime <= 5) {
+      r = x;
+      g = 0;
+      b = c;
+    }
+    else if (hPrime <= 6) {
+      r = c;
+      g = 0;
+      b = x;
+    }
+
+    r = Math.round((r + m) * 255);
+    g = Math.round((g + m) * 255);
+    b = Math.round((b + m) * 255);
+
+    return Color.fromRGBHelper(r, g, b);
+  }
 
   /**
    * Convert RGB color to HEX.
    * @param {string} color - The RGB color string.
    * @returns {string} The HEX color string.
    */
-  #toHex(color) {
-    if (color.match(/^rgb/)) {
-      // If RGB --> store the red, green, blue values in separate variables
-      const rgb = color.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+(?:\.\d+)?))?\)$/);
-      const r = parseInt(rgb[1]);
-      const g = parseInt(rgb[2]);
-      const b = parseInt(rgb[3]);
-
-      return `#${((r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase()}`;
+  toHex(color) {
+    // If RGB --> store the red, green, blue values in separate variables
+    if (color.match(/^rgb/i)) {
+      return this.fromRGB(color);
     }
-
+    // if hsl --> convert to rgb
+    if (color.match(/^hsl/i)) {
+      return this.fromHSL(color);
+    }
+    // If HEX --> return the color
+    if (color.match(/^#/)) {
+      return color;
+    }
     return color;
   };
 
@@ -58,6 +129,14 @@ class Color {
 
   static random() {
     return new Color(colorSpectrum[Math.floor(Math.random() * colorSpectrum.length)]);
+  }
+
+  static fromRGBHelper(red, green, blue) {
+    const colorString = [red, green, blue].map((color) => {
+      return color.toString(16).padStart(2, '0');
+    }).join('').toUpperCase();
+
+    return `#${colorString}`;
   }
 };
 

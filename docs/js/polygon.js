@@ -1,17 +1,45 @@
 /**
  * @class Polygon
  * @classdesc Represents a portion of a square. Each polygon is created with `count` which represents how polygons will be created to fill the square.
+ * @todo rename class to `Quadrilateral`
  */
 class Polygon {
-  constructor(count, sideLength, index) {
-    this.count = count * 2;
+  // TODO: remove this
+  static names = 4;
 
-    this.baseAngle = 360 / this.count;
+  /** the number of polygons to create */
+  count = null;
+  /** the angle each sector makes on a unit circle */
+  angle = null;
+
+  /** the number of points needed to make each polygon */
+  #pointCount = null;
+  /** the angle of each point */
+  #pointAngle = null;
+
+  /**
+   * Create a new Polygon
+   * @param {int} count how many polygons will make up the square
+   * @param {number} sideLength the length of a side
+   */
+  constructor(count, sideLength) {
+    this.count = count;
+    this.angle = 360 / this.count;
+
+    // cut each polygon in half
+    this.#pointCount = count * 2;
+    this.#pointAngle = 360 / this.#pointCount;
+
+    // the angle of each point
     this.radius = sideLength / 2;
 
     this.polygons = [];
   }
 
+  /**
+   * create the polygons
+   * @returns {Polygon} the polygon object
+   */
   draw() {
     this.polygons = [];
 
@@ -19,11 +47,12 @@ class Polygon {
 
     // center of the square
     const center = { x: 50, y: 50, angle: 0 };
-    for (let i = 0; i < this.count; i++) {
+    for (let i = 0; i < this.#pointCount; i++) {
+      // start creating a quadrilateral, starting at the center of the drawing
       let polygon = [center];
 
       for (let pointIndex = i; pointIndex < i + 3; pointIndex++) {
-        polygon.push(points[(i + pointIndex) % this.count]);
+        polygon.push(points[(i + pointIndex) % this.#pointCount]);
       }
 
       this.polygons.push(polygon);
@@ -32,84 +61,114 @@ class Polygon {
     return this;
   };
 
+  /**
+   * Calculate the points that make up the polygon
+   * @returns {array} an array of objects representing the intersection points
+   */
   calculatePoints() {
-    // the angle of each intersection point
-    const angles = [];
-    for (let i = 0; i < this.count; i++) {
-      angles.push(i * this.baseAngle);
-    }
-
-    return angles.map((angle) => {
-      return this.calculatePoint(angle);
+     return Array.from({ length: this.#pointCount }, (_, index) => {
+      return this.calculatePoint(index * this.#pointAngle);
     });
   }
 
   /**
-   * Calculate the intersection point for a given angle
+   * Calculate the x,y coordinates of a point on the square, given an angle
    * @param {number} angle the angle in degrees to calculate the point for
    * @returns {object} an object with x and y properties representing the point
    */
   calculatePoint(angle) {
     const radians = (Math.PI / 180) * angle;
 
+    // if the angle is halfway between a multiple of this.angle, print the angle
+    const isHalfAngle = angle % this.angle !== 0;
+
     let x, y;
     let modifiers = {
       x: {
         sign: 1,
-        function: Math.tan
+        hypotenuse: 1,
+        function: Math.tan,
       },
       y: {
         sign: 1,
-        function: Math.tan
-      },
-      hypotenuse: 1
+        hypotenuse: 1,
+        function: Math.tan,
+      }
     };
 
-    let sign = { x: 1, y: 1, hypotenuse: 1, function: Math.tan };
-    // ###### handle special cases first
-    if (angle === 0) {
-    // right edge, hal fway down
-      x = this.radius;
-      y = this.radius / 2;
+    if ([0, 90, 180, 270].indexOf(angle) > -1) {
+      modifiers.x.hypotenuse = 0;
+      modifiers.y.hypotenuse = 0;
     }
-    else if (angle === 90) {
-      // top edge, halfway across
-      x = this.radius / 2;
-      y = 0;
-    }
-    else if (angle === 180) {
-      // left edge, halfway down
-      x = 0;
-      y = this.radius / 2;
-    }
-    else if (angle === 270) {
-      // bottom edge, halfway across
-      x = this.radius / 2;
-      y = this.radius;
-    }
-    // ###### handle the rest
-    else {
-      if (angle > 0 && angle < 90) {
-        modifiers.y.sign = -1;
-        modifiers.y.function = Math.sin;
-      }
-      else if (angle > 90 && angle < 180) {
-        // no changes needed
-        modifiers.x.sign = 0;
-        modifiers.y.function = Math.sin;
-      }
-      else if (angle > 180 && angle < 270) {
-        modifiers.x.sign = -1;
-      }
-      else { // angle > 270 && angle < 360
-        modifiers.x.sign = 0;
-        modifiers.y.sign = 0;
-        // in the 4th quadrant, tan returns a negative value
-        modifiers.hypotenuse = -1;
-      }
 
-      x = modifiers.x.sign * this.radius + modifiers.hypotenuse * this.radius * modifiers.x.function(radians);
-      y = modifiers.y.sign * this.radius + modifiers.hypotenuse * this.radius * modifiers.y.function(radians);
+    // right edge, halfway down
+    if (angle === 0) {
+      modifiers.x.sign = 1;
+      modifiers.y.sign = 1 / 2;
+    }
+    // top edge, halfway across
+    else if (angle === 90) {
+      modifiers.x.sign = 1 / 2;
+      modifiers.y.sign = 0;
+    }
+    // left edge, halfway down
+    else if (angle === 180) {
+      modifiers.x.sign = 0;
+      modifiers.y.sign = 1 / 2;
+    }
+    // bottom edge, halfway across
+    else if (angle === 270) {
+      modifiers.x.sign = 1 / 2;
+      modifiers.y.sign = 1;
+    }
+    // 1st quadrant
+    else if (angle > 0 && angle < 90) {
+      modifiers.x.sign = 2;
+      modifiers.y.sign = -1;
+
+      modifiers.x.function = isHalfAngle ? Math.cos : Math.tan;
+      modifiers.y.function = isHalfAngle ? Math.sin : Math.tan;
+
+      // modifiers.x.hypotenuse = 1;
+      modifiers.y.hypotenuse = -2;
+    }
+    // 2nd quadrant
+    else if (angle > 90 && angle < 180) {
+      modifiers.x.sign = 0;
+      modifiers.y.sign = 1;
+    }
+    // 3rd quadrant
+    else if (angle > 180 && angle < 270) {
+      modifiers.x.sign = -2;
+    }
+    // 4th quadrant
+    else { // angle > 270 && angle < 360
+      modifiers.x.sign = 2;
+      modifiers.y.sign = 2;
+      modifiers.x.function = isHalfAngle ? Math.cos : Math.tan;
+      modifiers.y.function = isHalfAngle ? Math.sin : Math.tan;
+
+      // In the 4th quadrant, tan returns a negative value. Adjust the sign.
+      modifiers.x.hypotenuse = -1;
+      modifiers.y.hypotenuse = -1;
+    }
+
+    x = modifiers.x.sign * this.radius + clearRoundingError(modifiers.x.hypotenuse * this.radius * modifiers.x.function(radians));
+    y = modifiers.y.sign * this.radius + clearRoundingError(modifiers.y.hypotenuse * this.radius * modifiers.y.function(radians));
+
+    if (isHalfAngle && angle == 36 || angle == 72) {
+      console.log(`angle: ${angle}`);
+      let str = '';
+
+      str += `x = ${modifiers.x.sign} * ${this.radius} + ${modifiers.x.hypotenuse} * ${this.radius} * ${modifiers.x.function.name}(${angle})\n`;
+      str += `  = ${modifiers.x.sign * this.radius} + ${clearRoundingError(modifiers.x.hypotenuse * this.radius * modifiers.x.function(radians))}\n`;
+      str += `  = ${clearRoundingError(x)}\n`;
+
+      str += `y = ${modifiers.y.sign} * ${this.radius} + ${modifiers.y.hypotenuse} * ${this.radius} * ${modifiers.y.function.name}(${angle})\n`;
+      str += `  = ${modifiers.y.sign * this.radius} + ${clearRoundingError(modifiers.y.hypotenuse * this.radius * modifiers.y.function(radians))}\n`;
+      str += `  = ${clearRoundingError(y)}\n`;
+
+      console.log(str);
     }
 
     // convert x and y to percentages
@@ -124,19 +183,16 @@ class Polygon {
     x = clearRoundingError(x);
     y = clearRoundingError(y);
 
-    return { x, y , angle };
+    return { x, y , angle , xFunc: modifiers.x.function.name, yFunc: modifiers.y.function.name };
   }
 
-  toPolygonString(index) {
+  /**
+   * Generate a CSS clip-path for the specified portion of the polygon
+   * @param {int} index which polygon to generate a CSS clip-path for
+   * @returns {string} a string representing the polygon in CSS clip-path format
+   */
+  toPolygonClipPath(index) {
     const pointStringArray = this.polygons[index].map((point) => {
-      return `${point.x}% ${point.y}%`;
-    });
-
-    return `polygon(${pointStringArray.join(', ')})`;
-  }
-
-  toString() {
-    const pointStringArray = this.polygons[0].map((point) => {
       return `${point.x}% ${point.y}%`;
     });
 
@@ -147,6 +203,7 @@ class Polygon {
    * Gaussian area (Shoelace formula for polygon area)
    * @param {number} index - The index of the polygon to calculate the area of
    * @returns {number} The area of the polygon
+   * @see https://en.wikipedia.org/wiki/Shoelace_formula
    */
   area(index) {
     const polygon = this.polygons[index];

@@ -1,5 +1,5 @@
-import Person from './person.js';
 import Color from './color.js';
+import Person from './person.js';
 import Polygon from './polygon.js';
 
 class Wheel {
@@ -15,7 +15,7 @@ class Wheel {
     this.sliceCount = 0;
 
     // this.diameter = 250;
-    this.radius = 100;
+    this.radius = 2;
   };
 
   init() {
@@ -45,7 +45,7 @@ class Wheel {
   };
 
   draw() {
-    this.resize();
+    // this.resize();
     this.createSlices();
 
     return this;
@@ -90,24 +90,24 @@ class Wheel {
     const polygon = new Polygon(this.sliceCount, this.radius).draw();
 
     people.forEach((person, index) => {
-      if (index != 1) {
+      if (index != 0) {
         return;
       }
-      const backgroundColor = `hsl(${index * angleStep}, 100%, 45%)`; // Example color
+
+      polygon.polygons[index].forEach((point, i) => {
+        console.log(`${i}: ${point.x}, ${point.y}, ${point.angle}, ${point.xFunc}, ${point.yFunc}`);
+      });
+
+      const backgroundColor =new Color(`hsl(${index * angleStep}, 100%, 45%)`); // Example color
 
       let $slice = $('<div>')
         .addClass('slice')
         .css({
-          clipPath: polygon.toPolygonString(index),
-          backgroundColor: backgroundColor,
+          clipPath: polygon.toPolygonClipPath(index),
+          backgroundColor: backgroundColor.toString(),
         });
+      // }
 
-      if ([1, 3,7].includes(index)) {
-        console.log(`angle: ${polygon.polygons[index][1].angle}`);
-        polygon.polygons[index].forEach((point, i) => {
-          console.log(`${i}: ${point.x}, ${point.y}, ${point.angle}`);
-        });
-      }
       // const $text = $('<span>')
       //   .addClass(backgroundColor.isDark ? 'dark' : 'light')
       //   .text(person);

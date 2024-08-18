@@ -1,6 +1,4 @@
-import Polygon from "./polygon.js";
 import Wheel from "./wheel.js";
-
 
 /**
  * Randomly shuffles the elements in an array in place.
@@ -80,7 +78,7 @@ const darkModeToggler = function() {
 
 $(document).ready(function() {
   const names = []
-  for (let i = 1; i <= 5; i++) {
+  for (let i = 1; i <= 7; i++) {
     names.push(`Person ${i}`);
   }
   $(`#people-input`).val(names.join('\n'));

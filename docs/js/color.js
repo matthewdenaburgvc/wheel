@@ -9,7 +9,6 @@ class Color {
   constructor(color) {
     this.hex = this.toHex(color);
     this.isDark = this.isDark();
-
   };
 
   fromRGB(color) {

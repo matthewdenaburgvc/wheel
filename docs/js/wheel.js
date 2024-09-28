@@ -1,23 +1,51 @@
+import Sector from './sector.js';
 import Color from './color.js';
 import Person from './person.js';
-import Polygon from './polygon.js';
 
 class Wheel {
   static #alreadyLoaded = false;
   static #peopleInput = $("#people-input");
 
-  constructor(radius = 50, reuseColors = false) {
+  #radius = null;
+
+  /** Indicates if randomly generated colors be reused
+   * @type {boolean}
+   */
+  reuseColors = null;
+  /** the wheel
+   * @type {jQuery}
+   */
+  wheel = null;
+  /** the colors in use
+   * @type {Array<Color>}
+   */
+  colorsInUse = [];
+  /** the current angle of the wheel after a spin.
+   * @type {number}
+   */
+  currentAngle = null;
+  /** the number of slices on the wheel
+   * @type {number}
+   */
+  sliceCount = null;
+
+  /** Create a new Wheel
+   * @param {boolean} reuseColors - Indicates if randomly generated colors be reused
+   * @returns {Wheel} the wheel object
+   */
+  constructor(reuseColors = false) {
     this.reuseColors = reuseColors;
 
     this.wheel = null;
     this.colorsInUse = [];
     this.currentAngle = 90;
     this.sliceCount = 0;
-
-    // this.diameter = 250;
-    this.radius = 2;
+    this.#radius = 100
   };
 
+  /** Initialize the wheel
+   * @returns {Wheel} the wheel object
+   */
   init() {
     if (!Wheel.#alreadyLoaded) {
       this.wheel = $('<div>').attr('id', 'wheel');
@@ -36,6 +64,9 @@ class Wheel {
     return this;
   };
 
+  /** Load the names from the input
+   * @async
+   */
   async load() {
     // load the names
     const names = await Wheel.loadNamesFromInput();
@@ -44,21 +75,28 @@ class Wheel {
     });
   };
 
+  /** Draw the wheel
+   * @returns {Wheel} the wheel object
+   */
   draw() {
-    // this.resize();
+    this.resize();
     this.createSlices();
 
     return this;
   };
 
+  /** Resize the wheel
+   * @returns {Wheel} the wheel object
+   */
   resize() {
     var parentWidth = this.wheel.parent().width();
     var parentHeight = this.wheel.parent().height();
-    this.radius = Math.min(parentWidth, parentHeight);
+    this.#radius = Math.min(parentWidth, parentHeight);
+    this.#radius = Math.round(this.#radius);
 
     this.wheel.css({
-      width: this.radius + 'px',
-      height: this.radius + 'px'
+      width: this.#radius + 'px',
+      height: this.#radius + 'px'
     });
 
     return this;
@@ -80,6 +118,12 @@ class Wheel {
     return color;
   };
 
+  /** Create the slices
+   * @returns {Wheel} the wheel object
+   * @todo Refactor this method
+   * @todo Add text to slices
+   * @todo Add a border to slices
+   */
   createSlices() {
     const people = Person.getPeople();
     this.sliceCount = people.length;
@@ -87,26 +131,19 @@ class Wheel {
 
     this.wheel.empty();
 
-    const polygon = new Polygon(this.sliceCount, this.radius).draw();
+    const sector = new Sector(0, angleStep, this.#radius);
 
     people.forEach((person, index) => {
-      if (index != 0) {
-        return;
-      }
-
-      polygon.polygons[index].forEach((point, i) => {
-        console.log(`${i}: ${point.x}, ${point.y}, ${point.angle}, ${point.xFunc}, ${point.yFunc}`);
-      });
-
-      const backgroundColor =new Color(`hsl(${index * angleStep}, 100%, 45%)`); // Example color
+      const angle = index * angleStep;
+      const backgroundColor = new Color(`hsl(${Math.floor(angle)}, 100%, 45%)`);
 
       let $slice = $('<div>')
         .addClass('slice')
         .css({
-          clipPath: polygon.toPolygonClipPath(index),
           backgroundColor: backgroundColor.toString(),
+          clipPath: sector.clipPath,
+          transform: `rotate(${angle}deg)`,
         });
-      // }
 
       // const $text = $('<span>')
       //   .addClass(backgroundColor.isDark ? 'dark' : 'light')
@@ -117,6 +154,9 @@ class Wheel {
     });
   };
 
+  /** Spin the wheel
+   * @returns {Wheel} the wheel object\
+   */
   spin() {
     const newAngle = Math.floor(Math.random() * 360) // at least one partial spin
            + Math.floor(Math.random() * 2 + 1) * 360; // plus one or two more full spins
@@ -134,12 +174,21 @@ class Wheel {
     }, 1000); // Reset animation
   };
 
+  /** Load the names from the input
+   * @async
+   * @returns {Array<string>} the names from the input
+   */
   static async loadNamesFromInput() {
     return Wheel.#peopleInput.val()
       .split('\n')
       .filter(Boolean);
   };
 
+  /** Save the names to the input
+   * @async
+   * @param {Array<string>} names - the names
+   * @returns {void}
+   */
   static async saveNamesToInput(names) {
     Wheel.#peopleInput.val(names.join('\n'));
   };

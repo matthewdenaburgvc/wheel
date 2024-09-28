@@ -7,8 +7,10 @@ class Polygon {
   // TODO: remove this
   static names = 4;
 
-  /** the number of polygons to create */
-  count = null;
+  /** the number of polygons to create
+   * @type {int}
+   */
+  #count = null;
   /** the angle each sector makes on a unit circle */
   angle = null;
 
@@ -22,16 +24,20 @@ class Polygon {
    * @param {int} count how many polygons will make up the square
    * @param {number} sideLength the length of a side
    */
-  constructor(count, sideLength) {
-    this.count = count;
-    this.angle = 360 / this.count;
+  constructor(count) {
+    this.#count = count;
+    this.angle = 360 / this.#count;
 
     // cut each polygon in half
-    this.#pointCount = count * 2;
+    this.#pointCount = this.#count * 2;
+    if (this.#count === 1) {
+      // if we only have one polygon, we don't need to cut it in half
+      this.#pointCount = 1;
+    }
     this.#pointAngle = 360 / this.#pointCount;
 
-    // the angle of each point
-    this.radius = sideLength / 2;
+    // the circle's radius
+    this.radius = 1;
 
     this.polygons = [];
   }
@@ -43,7 +49,47 @@ class Polygon {
   draw() {
     this.polygons = [];
 
-    const points = this.calculatePoints();
+    return this.#count < 3 ? this.#drawSimple() : this.#drawComplex();
+  };
+
+  /**
+   * draw a simple polygon (only one or two)
+   */
+  #drawSimple() {
+    // full square
+    if (this.#count === 1) {
+      this.polygons.push([
+        { x: 0, y: 0 },
+        { x: 100, y: 0 },
+        { x: 100, y: 100 },
+        { x: 0, y: 100 }
+      ]);
+    }
+    // two rectangles - top and bottom half
+    else if (this.#count === 2) {
+      this.polygons.push([
+        { x: 0, y: 0 },
+        { x: 100, y: 0 },
+        { x: 100, y: 50 },
+        { x: 0, y: 50 }
+      ]);
+      this.polygons.push([
+        { x: 0, y: 50 },
+        { x: 100, y: 50 },
+        { x: 100, y: 100 },
+        { x: 0, y: 100 }
+      ]);
+    }
+
+    return this;
+  }
+
+  #drawComplex() {
+    // Calculate the points that make up the polygon
+    const points = [];
+    for (let i = 0; i < this.#pointCount; i++) {
+      points.push(this.calculatePoint(i * this.#pointAngle));
+    }
 
     // center of the square
     const center = { x: 50, y: 50, angle: 0 };
@@ -59,16 +105,6 @@ class Polygon {
     }
 
     return this;
-  };
-
-  /**
-   * Calculate the points that make up the polygon
-   * @returns {array} an array of objects representing the intersection points
-   */
-  calculatePoints() {
-     return Array.from({ length: this.#pointCount }, (_, index) => {
-      return this.calculatePoint(index * this.#pointAngle);
-    });
   }
 
   /**
@@ -96,6 +132,7 @@ class Polygon {
       }
     };
 
+    // special cases for multiples of 90 degrees
     if ([0, 90, 180, 270].indexOf(angle) > -1) {
       modifiers.x.hypotenuse = 0;
       modifiers.y.hypotenuse = 0;

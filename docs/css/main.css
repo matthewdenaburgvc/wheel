@@ -20,7 +20,7 @@ body, body.light-mode {
   --border-color: #e5e5e5;
   --hr-color: #f0f0f0;
   --code-text-color: #222;
-  --winner-overlay: #88888888;
+  --winner-overlay: #b4b4b4;
   --button-icon-position-x: calc(-1 * var(--button-icon-size));
 }
 body.dark-mode {
@@ -35,7 +35,7 @@ body.dark-mode {
   --border-color: #e5e5e5;
   --hr-color: #e5e5e5;
   --code-text-color: #e5e5e5;
-  --winner-overlay: #464646bf;
+  --winner-overlay: #464646;
   --button-icon-position-x: 0;
 }
 body h1 {

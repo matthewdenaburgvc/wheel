@@ -91,6 +91,7 @@ body .wrapper section.left {
   flex-basis: 25%;
 }
 body .wrapper section.left .header, body .wrapper section.left .footer {
+  text-wrap: nowrap;
   height: 18%;
   padding: 1% 0;
   margin: 0;
@@ -145,7 +146,6 @@ body .wrapper section.left .footer .view li::before {
   content: "View";
   position: absolute;
   left: 0;
-  color: currentColor;
 }
 body .wrapper section.right {
   padding-left: 2vw;
@@ -174,9 +174,6 @@ body .wrapper section.right #wheel-container #wheel .slice {
   padding: 0;
   margin: 0;
 }
-body .wrapper section.right #wheel-container #wheel .slice.border {
-  border: 1px solid var(--border-color);
-}
 body .wrapper section.right #wheel-container #wheel .slice span {
   position: absolute;
   color: #000;
@@ -189,6 +186,9 @@ body .wrapper section.right #wheel-container #wheel .slice span.dark {
 }
 body .wrapper section.right #wheel-container #wheel .slice span.light {
   color: #000;
+}
+body .wrapper section.right #wheel-container #wheel .slice.border {
+  border: 1px solid var(--border-color);
 }
 body .wrapper section .content {
   height: 100%;

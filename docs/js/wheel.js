@@ -158,7 +158,7 @@ class Wheel {
   /** Show the winner
    * @param {number} index - the index of the winner
    */
-   #showWinnerOverlay(index) {
+  #showWinnerOverlay(index) {
     // add the winner to the overlay
     $("#winner-name").text(this.#sectors[index].text);
     // show the overlay

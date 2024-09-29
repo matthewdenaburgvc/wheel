@@ -53,11 +53,28 @@ const darkModeToggler = function() {
   $themeToggle.on("click", toggleDarkMode);
 };
 
-$(document).ready(function() {
-  const names = []
-  for (let i = 1; i <= 6; i++) {
-    names.push(`Person ${i}`);
+const loadNamesFromUrl = function() {
+  const getUrlParameters = function(name) {
+    const params = new URLSearchParams(window.location.search);
+    return params.getAll(name);
+  };
+
+  const getNames = function(urlParam) {
+    return getUrlParameters(urlParam).map(decodeURIComponent);
   }
+
+  return getNames("name");
+}
+
+
+$(document).ready(function() {
+  const names = loadNamesFromUrl();
+  if (names.length === 0) {
+    for (let i = 1; i <= 6; i++) {
+      names.push(`Person ${i}`);
+    }
+  }
+
   $(`#people-input`).val(names.join('\n'));
 
   new Wheel().init();

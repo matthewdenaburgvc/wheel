@@ -8,38 +8,26 @@ class Wheel {
 
   #radius = null;
 
-  /** Indicates if randomly generated colors be reused
-   * @type {boolean}
-   */
-  reuseColors = null;
   /** the wheel
    * @type {jQuery}
    */
   wheel = null;
-  /** the colors in use
-   * @type {Array<Color>}
-   */
-  colorsInUse = [];
   /** the current angle of the wheel after a spin.
    * @type {number}
    */
-  currentAngle = null;
-  /** the number of slices on the wheel
-   * @type {number}
+  #currentAngle = null;
+  /** the slices on the wheel
+   * @type {Array<Sector>}
    */
-  sliceCount = null;
+  #sectors = null;
 
   /** Create a new Wheel
-   * @param {boolean} reuseColors - Indicates if randomly generated colors be reused
    * @returns {Wheel} the wheel object
    */
-  constructor(reuseColors = false) {
-    this.reuseColors = reuseColors;
-
+  constructor() {
+    this.#sectors = [];
     this.wheel = null;
-    this.colorsInUse = [];
-    this.currentAngle = 90;
-    this.sliceCount = 0;
+    this.#currentAngle = 90;
     this.#radius = 100
   };
 
@@ -80,7 +68,10 @@ class Wheel {
    */
   draw() {
     this.resize();
-    this.createSlices();
+    if (this.#sectors.length == 0) {
+      this.createSlices();
+    }
+    this.addSlices();
 
     return this;
   };
@@ -102,22 +93,6 @@ class Wheel {
     return this;
   };
 
-  randomColor() {
-    const color = Color.random()
-
-    // If we're reusing colors
-    if (!this.reuseColors) {
-      if (this.colorsInUse.includes(color)) {
-        return randomColor();
-      }
-
-      // Add the color to the list of colors in use
-      this.colorsInUse.push(color);
-    }
-
-    return color;
-  };
-
   /** Create the slices
    * @returns {Wheel} the wheel object
    * @todo Refactor this method
@@ -125,39 +100,35 @@ class Wheel {
    */
   createSlices() {
     const people = Person.getPeople();
-    this.sliceCount = people.length;
-    const angleStep = 360 / this.sliceCount;
-
-    this.wheel.empty();
-    const sector = new Sector(0, angleStep, this.#radius);
+    const sectorAngle = 360 / people.length;
 
     people.forEach((person, index) => {
-      const angle = index * angleStep;
+      const angle = index * sectorAngle;
       const backgroundColor = new Color(`hsl(${Math.floor(angle)}, 100%, 45%)`);
+      const sector = new Sector(sectorAngle, this.#radius, backgroundColor, person.name);
 
-      const $slice = $('<div>')
-        .addClass('slice')
-        .css({
-          backgroundColor: backgroundColor.toString(),
-          clipPath: sector.clipPath,
-          transform: `rotate(${angle - angleStep / 2}deg)`,
-        });
-
-      const textPosition = {
-        x: -this.#radius / 4 - angleStep,
-        y: -this.#radius / 4 + angleStep,
-      }
-      const $text = $('<span>')
-        .addClass(backgroundColor.isDark ? 'dark' : 'light')
-        .css({
-          transform: `translate(${textPosition.x}px, ${textPosition.y}px) rotate(${angleStep / 2}deg) translateY(0.5em)`,
-          lineHeight: 0,
-        })
-        .text(person);
-      $slice.append($text);
-
-      this.wheel.append($slice);
+      this.#sectors.push({
+        angle: angle - sectorAngle / 2,
+        sector: sector,
+      })
     });
+
+    return this;
+  };
+
+  addSlices() {
+    this.wheel.empty();
+
+    this.#sectors.forEach(element => {
+      let { angle, sector } = element;
+      this.wheel.append(
+        sector.toHtml().css({
+            transform: `rotate(${angle}deg)`,
+          })
+      );
+    });
+
+    return this;
   };
 
   /** Spin the wheel
@@ -166,11 +137,11 @@ class Wheel {
   spin() {
     const newAngle = Math.floor(Math.random() * 360) // at least one partial spin
            + Math.floor(Math.random() * 2 + 1) * 360; // plus one or two more full spins
-    this.currentAngle += newAngle;
+    this.#currentAngle += newAngle;
 
     this.wheel.css({
       transition: 'transform 1s ease-out',
-      transform: `rotate(${this.currentAngle}deg)`,
+      transform: `rotate(${this.#currentAngle}deg)`,
     });
 
     setTimeout(() => {

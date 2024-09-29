@@ -78,7 +78,7 @@ const darkModeToggler = function() {
 
 $(document).ready(function() {
   const names = []
-  for (let i = 1; i <= 7; i++) {
+  for (let i = 1; i <= 6; i++) {
     names.push(`Person ${i}`);
   }
   $(`#people-input`).val(names.join('\n'));

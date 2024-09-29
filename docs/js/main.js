@@ -1,29 +1,6 @@
 import Wheel from "./wheel.js";
 
 /**
- * Randomly shuffles the elements in an array in place.
- *
- * @param {Array} objects The array to be shuffled.
- * @returns {Array} The shuffled array.
- */
-const shuffle = function(objects) {
-  var jdx, item;
-
-  // Loop over the array in reverse order
-  for (var idx = objects.length; idx > 0; idx--) {
-    // Generate a random index j
-    jdx = parseInt(Math.random() * idx);
-
-    // Swap elements at indices i-1 and j
-    item = objects[idx - 1];
-    objects[idx - 1] = objects[jdx];
-    objects[jdx] = item;
-  }
-
-  return objects;
-};
-
-/**
  * Toggles between light and dark mode
  */
 const darkModeToggler = function() {
@@ -73,14 +50,31 @@ const darkModeToggler = function() {
   }
 
   // Event listener for the theme toggle button
-  $themeToggle.click(toggleDarkMode);
+  $themeToggle.on("click", toggleDarkMode);
 };
 
-$(document).ready(function() {
-  const names = []
-  for (let i = 1; i <= 7; i++) {
-    names.push(`Person ${i}`);
+const loadNamesFromUrl = function() {
+  const getUrlParameters = function(name) {
+    const params = new URLSearchParams(window.location.search);
+    return params.getAll(name);
+  };
+
+  const getNames = function(urlParam) {
+    return getUrlParameters(urlParam).map(decodeURIComponent);
   }
+
+  return getNames("name");
+}
+
+
+$(document).ready(function() {
+  const names = loadNamesFromUrl();
+  if (names.length === 0) {
+    for (let i = 1; i <= 6; i++) {
+      names.push(`Person ${i}`);
+    }
+  }
+
   $(`#people-input`).val(names.join('\n'));
 
   new Wheel().init();

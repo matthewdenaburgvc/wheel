@@ -20,6 +20,7 @@ body, body.light-mode {
   --border-color: #e5e5e5;
   --hr-color: #f0f0f0;
   --code-text-color: #222;
+  --winner-overlay: #b4b4b4;
   --button-icon-position-x: calc(-1 * var(--button-icon-size));
 }
 body.dark-mode {
@@ -34,6 +35,7 @@ body.dark-mode {
   --border-color: #e5e5e5;
   --hr-color: #e5e5e5;
   --code-text-color: #e5e5e5;
+  --winner-overlay: #464646;
   --button-icon-position-x: 0;
 }
 body h1 {
@@ -89,6 +91,7 @@ body .wrapper section.left {
   flex-basis: 25%;
 }
 body .wrapper section.left .header, body .wrapper section.left .footer {
+  text-wrap: nowrap;
   height: 18%;
   padding: 1% 0;
   margin: 0;
@@ -143,7 +146,6 @@ body .wrapper section.left .footer .view li::before {
   content: "View";
   position: absolute;
   left: 0;
-  color: currentColor;
 }
 body .wrapper section.right {
   padding-left: 2vw;
@@ -155,6 +157,7 @@ body .wrapper section.right #wheel-container {
   height: 100%;
   max-width: 600px;
   max-height: 600px;
+  font-size: 1.25rem;
 }
 body .wrapper section.right #wheel-container #wheel {
   position: relative;
@@ -171,9 +174,6 @@ body .wrapper section.right #wheel-container #wheel .slice {
   padding: 0;
   margin: 0;
 }
-body .wrapper section.right #wheel-container #wheel .slice.border {
-  border: 1px solid var(--border-color);
-}
 body .wrapper section.right #wheel-container #wheel .slice span {
   position: absolute;
   color: #000;
@@ -187,8 +187,45 @@ body .wrapper section.right #wheel-container #wheel .slice span.dark {
 body .wrapper section.right #wheel-container #wheel .slice span.light {
   color: #000;
 }
+body .wrapper section.right #wheel-container #wheel .slice.border {
+  border: 1px solid var(--border-color);
+}
 body .wrapper section .content {
   height: 100%;
+}
+body #winner-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+}
+body #winner-overlay .winner-box {
+  position: fixed;
+  top: 25vh;
+  left: 25vw;
+  width: 50vw;
+  height: 30vh;
+  background-color: var(--winner-overlay);
+  border: 4px double var(--border-color);
+  display: flexbox;
+  vertical-align: middle;
+  text-align: center;
+  align-items: center;
+}
+body #winner-overlay .winner-box * {
+  width: 100%;
+  position: relative;
+  color: var(--h1-color);
+}
+body #winner-overlay .winner-box h1 {
+  font-size: 3rem;
+}
+body .hidden {
+  display: none;
+}
+body .visible {
+  display: block;
 }
 body #people {
   display: none;

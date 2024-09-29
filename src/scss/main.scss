@@ -23,6 +23,7 @@ body {
     --border-color: #e5e5e5;
     --hr-color: #f0f0f0;
     --code-text-color: #222;
+    --winner-overlay: #b4b4b4;
 
     // shift the button icons to the left for light mode
     --button-icon-position-x: calc(-1 * var(--button-icon-size));
@@ -40,6 +41,8 @@ body {
     --border-color: #e5e5e5;
     --hr-color: #e5e5e5;
     --code-text-color: #e5e5e5;
+    --winner-overlay: #464646;
+    // --winner-overlay: rgba(0, 0, 0, 0.75);
 
     --button-icon-position-x: 0;
   }
@@ -100,6 +103,8 @@ body {
         flex-basis: 25%;
 
         .header, .footer {
+          text-wrap: nowrap;
+
           height: 18%;
           padding: 1% 0;
           margin: 0;
@@ -172,7 +177,6 @@ body {
                 content: "View";
                 position: absolute;
                 left: 0;
-                color: currentColor;
               }
             }
           }
@@ -190,6 +194,7 @@ body {
           height: 100%;
           max-width: 600px;
           max-height: 600px;
+          font-size: 1.25rem;
 
           #wheel {
             position: relative;
@@ -203,10 +208,6 @@ body {
             overflow: hidden;
 
             .slice {
-              &.border {
-                border: 1px solid var(--border-color);
-              }
-
               position: absolute;
 
               width: 100%;
@@ -230,6 +231,10 @@ body {
                   color: #000;
                 }
               }
+
+              &.border {
+                border: 1px solid var(--border-color);
+              }
             }
           }
         }
@@ -239,6 +244,47 @@ body {
         height: 100%;
       }
     }
+  }
+
+  #winner-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+
+    .winner-box {
+      position: fixed;
+      top: 25vh;
+      left: 25vw;
+      width: 50vw;
+      height: 30vh;
+
+      background-color: var(--winner-overlay);
+      border: 4px double var(--border-color);
+
+      display: flexbox;
+      vertical-align: middle;
+      text-align: center;
+      align-items: center;
+
+      * {
+        width: 100%;
+        position: relative;
+        color: var(--h1-color);
+      }
+
+      h1 {
+        font-size: 3rem;
+      }
+    }
+  }
+
+  .hidden {
+    display: none;
+  }
+  .visible {
+    display: block;
   }
 
   #people {
@@ -251,11 +297,3 @@ body {
     position: absolute;
   }
 }
-
-// // dark/light mode
-// @media (prefers-color-scheme: dark) {
-//   body {
-//     @extend .dark-mode;
-//   }
-
-// }

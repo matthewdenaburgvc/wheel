@@ -1,27 +1,26 @@
-import Angle from "./angle.js"
+import Angle from "./angle.js";
 
 class Sector {
   /**
    * @type {Angle}
    */
-  #rotation;
+  #rotation = new Angle(0);
 
   /**
    * @type {Angle}
    */
-  #arcAngle;
+  #arcAngle = new Angle(0);
 
   #radius = 0;
 
   /**
-   * @type {number} - The angle of the sector, in degrees.
+   * @param {number} angle
+   * @param {number} radius
+   * @param {Color} color
    */
-  constructor(rotation, angle, radius) {
-    this.#rotation = new Angle(rotation);
-    this.#arcAngle = new Angle(rotation - angle);
-    this.#radius = radius;
-
-    this.clipPath = `path("${this.#draw()}")`;
+  constructor(color, text) {
+    this.color = color;
+    this.text = text;
   };
 
   /**
@@ -47,9 +46,9 @@ class Sector {
 
   #pointString(point) {
     return `${point.x} ${point.y}`;
-  }
+  };
 
-  #draw() {
+  get clipPath() {
     // center of the circle
     const center = this.#pointString({ x: this.#radius / 2, y: this.#radius / 2} );
     // start point of the arc
@@ -65,14 +64,70 @@ class Sector {
       this.#pointString(arcPoint)
     ].join(' ');
 
-    const clipPath = [
+    const path = [
       `M ${center}`, // move to center
       `L ${this.#pointString(radiusPoint)}`, // line to start point
       `A ${arc}`, // arc to end point
       'Z' // close path
     ].join(' ')
 
-    return clipPath;
+    return `path("${path}")`;
+  };
+
+  toHtml() {
+    const arcAngle = this.#arcAngle.degrees;
+
+    const textPosition = {
+      x: -this.#radius / 4 - arcAngle,
+      y: -this.#radius / 4 + arcAngle
+    }
+
+    const $slice = $('<div>')
+      .addClass('slice')
+      .css({
+        backgroundColor: this.color.toString(),
+        clipPath: this.clipPath,
+      });
+
+    const $text = $('<span>')
+      .addClass(this.color.isDark ? 'dark' : 'light')
+      .css({
+        transform: `translate(${textPosition.x}px, ${textPosition.y}px) rotate(${arcAngle / 2}deg) translateY(0.5em)`,
+        lineHeight: 0,
+      })
+      .text(this.text);
+
+    $slice.append($text);
+
+    return $slice;
+  };
+
+  /**
+    * @returns {Angle}
+    */
+  get arcAngle() {
+    return this.#arcAngle;
+  };
+
+  /**
+   * @param {number} newAngle - The angle, in degrees.
+   */
+  set arcAngle(newAngle) {
+    this.#arcAngle = new Angle(newAngle);
+  };
+
+  /**
+   * @returns {number}
+   */
+  get radius() {
+    return this.#radius;
+  };
+
+  /**
+   * @param {number} newRadius
+   */
+  set radius(newRadius) {
+    this.#radius = newRadius;
   };
 };
 

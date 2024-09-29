@@ -8,39 +8,22 @@ class Wheel {
 
   #radius = null;
 
-  /** Indicates if randomly generated colors be reused
-   * @type {boolean}
-   */
-  reuseColors = null;
   /** the wheel
    * @type {jQuery}
    */
   wheel = null;
-  /** the colors in use
-   * @type {Array<Color>}
+  /** the slices on the wheel
+   * @type {Array<Sector>}
    */
-  colorsInUse = [];
-  /** the current angle of the wheel after a spin.
-   * @type {number}
-   */
-  currentAngle = null;
-  /** the number of slices on the wheel
-   * @type {number}
-   */
-  sliceCount = null;
+  #sectors = null;
 
   /** Create a new Wheel
-   * @param {boolean} reuseColors - Indicates if randomly generated colors be reused
    * @returns {Wheel} the wheel object
    */
-  constructor(reuseColors = false) {
-    this.reuseColors = reuseColors;
-
+  constructor() {
     this.wheel = null;
-    this.colorsInUse = [];
-    this.currentAngle = 90;
-    this.sliceCount = 0;
-    this.#radius = 100
+    this.#sectors = [];
+    this.#radius = 100;
   };
 
   /** Initialize the wheel
@@ -52,12 +35,13 @@ class Wheel {
       $("#wheel-container").append(this.wheel);
     }
 
-    this.load().then(() => {
+    this.#load().then(() => {
       this.draw();
     });
 
-    this.wheel.click(this.spin.bind(this));
-    $(window).resize(this.draw.bind(this));
+    this.wheel.click(this.#spin.bind(this));
+    $("#winner-overlay").on("click", this.#hideWinnerOverlay.bind(this));
+    $(window).on("resize", this.draw.bind(this));
 
     Wheel.#alreadyLoaded = true;
 
@@ -67,7 +51,7 @@ class Wheel {
   /** Load the names from the input
    * @async
    */
-  async load() {
+  async #load() {
     // load the names
     const names = await Wheel.loadNamesFromInput();
     names.forEach(name => {
@@ -79,8 +63,11 @@ class Wheel {
    * @returns {Wheel} the wheel object
    */
   draw() {
-    this.resize();
-    this.createSlices();
+    this.#resize();
+    if (this.#sectors.length == 0) {
+      this.#createSlices();
+    }
+    this.#drawSlices();
 
     return this;
   };
@@ -88,7 +75,7 @@ class Wheel {
   /** Resize the wheel
    * @returns {Wheel} the wheel object
    */
-  resize() {
+  #resize() {
     var parentWidth = this.wheel.parent().width();
     var parentHeight = this.wheel.parent().height();
     this.#radius = Math.min(parentWidth, parentHeight);
@@ -102,82 +89,98 @@ class Wheel {
     return this;
   };
 
-  randomColor() {
-    const color = Color.random()
-
-    // If we're reusing colors
-    if (!this.reuseColors) {
-      if (this.colorsInUse.includes(color)) {
-        return randomColor();
-      }
-
-      // Add the color to the list of colors in use
-      this.colorsInUse.push(color);
-    }
-
-    return color;
-  };
-
   /** Create the slices
    * @returns {Wheel} the wheel object
    * @todo Refactor this method
    * @todo Add a border to slices
    */
-  createSlices() {
+  #createSlices() {
     const people = Person.getPeople();
-    this.sliceCount = people.length;
-    const angleStep = 360 / this.sliceCount;
-
-    this.wheel.empty();
-    const sector = new Sector(0, angleStep, this.#radius);
+    const sectorAngle = 360 / people.length;
 
     people.forEach((person, index) => {
-      const angle = index * angleStep;
+      const angle = index * sectorAngle;
       const backgroundColor = new Color(`hsl(${Math.floor(angle)}, 100%, 45%)`);
-
-      const $slice = $('<div>')
-        .addClass('slice')
-        .css({
-          backgroundColor: backgroundColor.toString(),
-          clipPath: sector.clipPath,
-          transform: `rotate(${angle - angleStep / 2}deg)`,
-        });
-
-      const textPosition = {
-        x: -this.#radius / 4 - angleStep,
-        y: -this.#radius / 4 + angleStep,
-      }
-      const $text = $('<span>')
-        .addClass(backgroundColor.isDark ? 'dark' : 'light')
-        .css({
-          transform: `translate(${textPosition.x}px, ${textPosition.y}px) rotate(${angleStep / 2}deg) translateY(0.5em)`,
-          lineHeight: 0,
-        })
-        .text(person);
-      $slice.append($text);
-
-      this.wheel.append($slice);
+      const sector = new Sector(backgroundColor, person.name);
+      this.#sectors.push(sector);
     });
+
+    return this;
+  };
+
+  #drawSlices() {
+    this.wheel.empty();
+    const sectorAngle = 360 / this.#sectors.length
+
+    this.#sectors.forEach((sector, index) => {
+      const angle = index * sectorAngle - sectorAngle / 2;
+      sector.arcAngle = sectorAngle;
+      sector.radius = this.#radius;
+
+      this.wheel.append(
+        sector.toHtml().css({
+            transform: `rotate(${angle}deg)`,
+          })
+      );
+    });
+
+    return this;
   };
 
   /** Spin the wheel
    * @returns {Wheel} the wheel object\
    */
-  spin() {
-    const newAngle = Math.floor(Math.random() * 360) // at least one partial spin
-           + Math.floor(Math.random() * 2 + 1) * 360; // plus one or two more full spins
-    this.currentAngle += newAngle;
+  #spin() {
+    const count = this.#sectors.length;
+    // select random sector
+    const index = Math.floor(Math.random() * count)
+    // do at most 3 rotations, and stop at that sector's angle
+    const angle = Math.floor(Math.random() * 2 + 1) * 360 - 360 / count * index;
 
     this.wheel.css({
-      transition: 'transform 1s ease-out',
-      transform: `rotate(${this.currentAngle}deg)`,
+      transition: 'transform 1.5s ease-out',
+      transform: `rotate(${angle}deg)`,
     });
 
     setTimeout(() => {
+      // stop rotation
       this.wheel.css({
         transition: 'none',
       });
-    }, 1000); // Reset animation
+
+      // remove selected person
+      this.#showWinnerOverlay(index);
+    }, 1500); // Reset animation
+
+    return this;
+  };
+
+  /** Show the winner
+   * @param {number} index - the index of the winner
+   */
+  #showWinnerOverlay(index) {
+    // add the winner to the overlay
+    $("#winner-name").text(this.#sectors[index].text);
+    // show the overlay
+    $("#winner-overlay").show();
+    // remove the winner from the wheel
+    this.#sectors.splice(index, 1);
+
+    return this;
+  };
+
+  #hideWinnerOverlay() {
+    // reset the wheel angle
+    this.wheel.css({
+      transition: 'transform',
+      transform: 'rotate(0deg)',
+    });
+    // hide the overlay
+    $("#winner-overlay").hide();
+    // redraw the wheel
+    this.#drawSlices();
+
+    return this;
   };
 
   /** Load the names from the input

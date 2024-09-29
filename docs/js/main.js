@@ -1,29 +1,6 @@
 import Wheel from "./wheel.js";
 
 /**
- * Randomly shuffles the elements in an array in place.
- *
- * @param {Array} objects The array to be shuffled.
- * @returns {Array} The shuffled array.
- */
-const shuffle = function(objects) {
-  var jdx, item;
-
-  // Loop over the array in reverse order
-  for (var idx = objects.length; idx > 0; idx--) {
-    // Generate a random index j
-    jdx = parseInt(Math.random() * idx);
-
-    // Swap elements at indices i-1 and j
-    item = objects[idx - 1];
-    objects[idx - 1] = objects[jdx];
-    objects[jdx] = item;
-  }
-
-  return objects;
-};
-
-/**
  * Toggles between light and dark mode
  */
 const darkModeToggler = function() {
@@ -73,7 +50,7 @@ const darkModeToggler = function() {
   }
 
   // Event listener for the theme toggle button
-  $themeToggle.click(toggleDarkMode);
+  $themeToggle.on("click", toggleDarkMode);
 };
 
 $(document).ready(function() {

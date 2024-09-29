@@ -1,16 +1,15 @@
 import Angle from "./angle.js";
-import Color from './color.js';
 
 class Sector {
   /**
    * @type {Angle}
    */
-  #rotation;
+  #rotation = new Angle(0);
 
   /**
    * @type {Angle}
    */
-  #arcAngle;
+  #arcAngle = new Angle(0);
 
   #radius = 0;
 
@@ -19,10 +18,7 @@ class Sector {
    * @param {number} radius
    * @param {Color} color
    */
-  constructor(angle, radius, color, text) {
-    this.#rotation = new Angle(0);
-    this.#arcAngle = new Angle(angle);
-    this.#radius = radius;
+  constructor(color, text) {
     this.color = color;
     this.text = text;
   };
@@ -50,7 +46,7 @@ class Sector {
 
   #pointString(point) {
     return `${point.x} ${point.y}`;
-  }
+  };
 
   get clipPath() {
     // center of the circle
@@ -104,21 +100,35 @@ class Sector {
     $slice.append($text);
 
     return $slice;
-  }
+  };
 
   /**
     * @returns {Angle}
     */
   get arcAngle() {
     return this.#arcAngle;
-  }
+  };
 
   /**
    * @param {number} newAngle - The angle, in degrees.
    */
   set arcAngle(newAngle) {
     this.#arcAngle = new Angle(newAngle);
-  }
+  };
+
+  /**
+   * @returns {number}
+   */
+  get radius() {
+    return this.#radius;
+  };
+
+  /**
+   * @param {number} newRadius
+   */
+  set radius(newRadius) {
+    this.#radius = newRadius;
+  };
 };
 
 export default Sector;

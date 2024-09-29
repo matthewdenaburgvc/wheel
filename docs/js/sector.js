@@ -1,6 +1,8 @@
 import Angle from "./angle.js";
 
 class Sector {
+  static #count = 0;
+
   /**
    * @type {Angle}
    */
@@ -11,6 +13,7 @@ class Sector {
    */
   #arcAngle = new Angle(0);
 
+  text = null;
   #radius = 0;
 
   /**
@@ -74,14 +77,11 @@ class Sector {
     return `path("${path}")`;
   };
 
+  get $text() {
+
+  };
+
   toHtml() {
-    const arcAngle = this.#arcAngle.degrees;
-
-    const textPosition = {
-      x: -this.#radius / 4 - arcAngle,
-      y: -this.#radius / 4 + arcAngle
-    }
-
     const $slice = $('<div>')
       .addClass('slice')
       .css({
@@ -89,13 +89,19 @@ class Sector {
         clipPath: this.clipPath,
       });
 
+    const arcAngle = Sector.#count > 1 ? this.#arcAngle.degrees : 0;
+    const textPosition = {
+      x: -this.#radius / 4 - arcAngle,
+      y: -this.#radius / 4 + arcAngle
+    }
+
     const $text = $('<span>')
+      .addClass('name')
       .addClass(this.color.isDark ? 'dark' : 'light')
+      .text(this.text)
       .css({
-        transform: `translate(${textPosition.x}px, ${textPosition.y}px) rotate(${arcAngle / 2}deg) translateY(0.5em)`,
-        lineHeight: 0,
-      })
-      .text(this.text);
+        transform: `translate(${textPosition.x}px, ${textPosition.y}px) rotate(${arcAngle / 2}deg)`,
+      });
 
     $slice.append($text);
 
@@ -128,6 +134,10 @@ class Sector {
    */
   set radius(newRadius) {
     this.#radius = newRadius;
+  };
+
+  static updateCount(count) {
+    Sector.#count = count;
   };
 };
 

@@ -12,7 +12,7 @@ class Angle {
    * @param {number} angle - The angle, in degrees.
    */
   constructor(angle) {
-    this.#angle = Math.abs(angle);
+    this.#angle = Math.abs(angle) % 360;
   };
 
   /**

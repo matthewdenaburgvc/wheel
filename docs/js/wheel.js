@@ -1,10 +1,8 @@
 import Sector from './sector.js';
 import Color from './color.js';
-import Person from './person.js';
 
 class Wheel {
-  static #alreadyLoaded = false;
-  static #peopleInput = $("#people-input");
+  static self = null;
 
   #radius = null;
 
@@ -20,43 +18,36 @@ class Wheel {
   /** Create a new Wheel
    * @returns {Wheel} the wheel object
    */
-  constructor() {
+  constructor(names) {
+    if (Wheel.self) {
+      return Wheel.self;
+    }
+
+    this.names = names;
     this.wheel = null;
     this.#sectors = [];
     this.#radius = 100;
+
+    Wheel.self = this;
   };
 
   /** Initialize the wheel
    * @returns {Wheel} the wheel object
    */
   init() {
-    if (!Wheel.#alreadyLoaded) {
-      this.wheel = $('<div>').attr('id', 'wheel');
-      $("#wheel-container").append(this.wheel);
-    }
+    $("#wheel-container").empty();
+    this.#sectors = [];
 
-    this.#load().then(() => {
-      this.draw();
-    });
+    this.wheel = $('<div>').attr('id', 'wheel');
+    $("#wheel-container").append(this.wheel);
+
+    this.draw();
 
     this.wheel.click(this.#spin.bind(this));
     $("#winner-overlay").on("click", this.#hideWinnerOverlay.bind(this));
     $(window).on("resize", this.draw.bind(this));
 
-    Wheel.#alreadyLoaded = true;
-
     return this;
-  };
-
-  /** Load the names from the input
-   * @async
-   */
-  async #load() {
-    // load the names
-    const names = await Wheel.loadNamesFromInput();
-    names.forEach(name => {
-      new Person(name);
-    });
   };
 
   /** Draw the wheel
@@ -95,13 +86,12 @@ class Wheel {
    * @todo Add a border to slices
    */
   #createSlices() {
-    const people = Person.getPeople();
-    const sectorAngle = 360 / people.length;
+    const sectorAngle = 360 / this.names.length;
 
-    people.forEach((person, index) => {
+    this.names.forEach((name, index) => {
       const angle = index * sectorAngle;
       const backgroundColor = new Color(`hsl(${Math.floor(angle)}, 100%, 45%)`);
-      const sector = new Sector(backgroundColor, person.name);
+      const sector = new Sector(backgroundColor, name);
       this.#sectors.push(sector);
     });
 
@@ -110,17 +100,24 @@ class Wheel {
 
   #drawSlices() {
     this.wheel.empty();
-    const sectorAngle = 360 / this.#sectors.length
+    const sectorAngle = 360 / this.#sectors.length;
+    Sector.updateCount(this.#sectors.length);
 
     this.#sectors.forEach((sector, index) => {
-      const angle = index * sectorAngle - sectorAngle / 2;
+      let angle = index * sectorAngle - sectorAngle / 2;
       sector.arcAngle = sectorAngle;
       sector.radius = this.#radius;
 
+      // if there is only one sector, make it a full circle
+      if (this.#sectors.length === 1) {
+        sector.arcAngle = 359.9999;
+        angle = 0;
+      }
+
       this.wheel.append(
         sector.toHtml().css({
-            transform: `rotate(${angle}deg)`,
-          })
+          transform: `rotate(${angle}deg)`,
+        })
       );
     });
 
@@ -181,25 +178,6 @@ class Wheel {
     this.#drawSlices();
 
     return this;
-  };
-
-  /** Load the names from the input
-   * @async
-   * @returns {Array<string>} the names from the input
-   */
-  static async loadNamesFromInput() {
-    return Wheel.#peopleInput.val()
-      .split('\n')
-      .filter(Boolean);
-  };
-
-  /** Save the names to the input
-   * @async
-   * @param {Array<string>} names - the names
-   * @returns {void}
-   */
-  static async saveNamesToInput(names) {
-    Wheel.#peopleInput.val(names.join('\n'));
   };
 };
 

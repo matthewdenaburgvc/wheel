@@ -6,7 +6,6 @@ import Wheel from "./wheel.js";
 const darkModeToggler = function() {
   const darkThemeClass = 'dark-mode';
   const lightThemeClass = 'light-mode';
-  const $themeToggle = $('#theme-toggle');
 
   /**
    * Apply the dark theme class to the body
@@ -48,9 +47,12 @@ const darkModeToggler = function() {
     // If no saved preference, apply system preference
     applyDarkMode();
   }
+  else {
+    // still nothing, apply dark theme
+    applyDarkMode()
+  }
 
-  // Event listener for the theme toggle button
-  $themeToggle.on("click", toggleDarkMode);
+  return toggleDarkMode;
 };
 
 const loadNamesFromUrl = function() {
@@ -64,57 +66,79 @@ const loadNamesFromUrl = function() {
   }
 
   return getNames("name");
+};
+
+const shareUrl = function() {
+  const names = $('#people-input').val().split('\n').map(encodeURIComponent).join('&name=');
+  const url = new URL(window.location);
+  url.searchParams.set('name', names);
+
+  const shareableUrl = decodeURIComponent(url.href);
+
+  navigator.clipboard.writeText(shareableUrl).then(function() {
+    alert("Sharable URL copied to clipboard!");
+  }, function() {
+    alert("Failed to copy URL to clipboard.");
+  });
+};
+
+const shuffle = function(objects) {
+  var jdx, item;
+  // Loop over the array in reverse order
+  for (var idx = objects.length; idx > 0; idx--) {
+    // Generate a random index j
+    jdx = parseInt(Math.random() * idx);
+    // Swap elements at indices i-1 and j
+    item = objects[idx - 1];
+    objects[idx - 1] = objects[jdx];
+    objects[jdx] = item;
+  }
+  return objects;
+};
+
+const newWheel = function() {
+  var $list = $('#people ul').empty(); // Clear existing list and select the ul
+
+  const inputNames = $('#people-input').val().split('\n').filter(Boolean);
+  inputNames.forEach((name, index) => {
+    var $li = $('<li/>');
+    var $checkbox = $('<input/>', {
+      id: 'name_' + index,
+      name: name,
+      value: name,
+      type: 'checkbox',
+      checked: true,
+    });
+    var $label = $('<label/>', {
+      for: 'name_' + index,
+      text: name
+    });
+
+    $li.append($checkbox).append($label);
+    $list.append($li);
+  });
+
+  $('#configure-people').hide();
+  $('#people').show();
+
+  Wheel.self.names = shuffle(inputNames);
+  Wheel.self.init();
 }
 
-
 $(document).ready(function() {
-  const names = loadNamesFromUrl();
+  const names = shuffle(loadNamesFromUrl());
   if (names.length === 0) {
     for (let i = 1; i <= 6; i++) {
       names.push(`Person ${i}`);
     }
   }
 
+  $("#save").on("click", shareUrl);
+  $('#theme-toggle').on("click", darkModeToggler());
+  $('#go-button').on("click", newWheel);
+
   $(`#people-input`).val(names.join('\n'));
 
-  new Wheel().init();
-
-  darkModeToggler();
-
-  // $('#go-button').click(wheel.draw());
-  // $(window).resize(makeWheelSquare);
-  /*
-  // show the checkboxes
-  $('#go-button').click(function() {
-    var inputNames = $('#people-input').val().split('\n');
-    var $list = $('#people ul').empty(); // Clear existing list and select the ul
-
-    $.each(inputNames, function(i, name) {
-      if (name.trim() !== '') { // Ignore empty lines
-        var hash = hashCode(name);
-
-        var $li = $('<li/>');
-        var $checkbox = $('<input/>', {
-          id: 'name_' + hash, // Ensure unique ID
-          name: name,
-          value: name,
-          type: 'checkbox',
-          checked: true,
-        });
-        var $label = $('<label/>', {
-          for: 'name_' + hash,
-          text: name
-        });
-        people.pop(buildName(name));
-
-        $li.append($checkbox).append($label);
-        $list.append($li);
-      }
-    });
-
-    $('#configure-people').hide();
-    $('#people').show();
-  });
-  */
+  new Wheel(names).init();
 });
 

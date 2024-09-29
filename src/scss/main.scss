@@ -203,7 +203,9 @@ body {
             overflow: hidden;
 
             .slice {
-              // border: 1px solid var(--border-color);
+              &.border {
+                border: 1px solid var(--border-color);
+              }
 
               position: absolute;
 
@@ -212,8 +214,6 @@ body {
               padding: 0;
               margin: 0;
 
-              // overflow: hidden;
-
               span {
                 position: absolute;
                 color: #000;
@@ -221,8 +221,6 @@ body {
                 top: 75%;
                 left: 100%;
 
-                transform: translate(-50%, -50%) rotate(-90deg);
-                transform-origin: 0 0;
                 white-space: nowrap;
 
                 &.dark {

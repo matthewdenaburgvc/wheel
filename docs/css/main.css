@@ -171,13 +171,14 @@ body .wrapper section.right #wheel-container #wheel .slice {
   padding: 0;
   margin: 0;
 }
+body .wrapper section.right #wheel-container #wheel .slice.border {
+  border: 1px solid var(--border-color);
+}
 body .wrapper section.right #wheel-container #wheel .slice span {
   position: absolute;
   color: #000;
   top: 75%;
   left: 100%;
-  transform: translate(-50%, -50%) rotate(-90deg);
-  transform-origin: 0 0;
   white-space: nowrap;
 }
 body .wrapper section.right #wheel-container #wheel .slice span.dark {

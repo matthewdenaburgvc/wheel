@@ -57,7 +57,7 @@ class Wheel {
     });
 
     this.wheel.click(this.spin.bind(this));
-    $(window).resize(this.resize.bind(this));
+    $(window).resize(this.draw.bind(this));
 
     Wheel.#alreadyLoaded = true;
 
@@ -121,7 +121,6 @@ class Wheel {
   /** Create the slices
    * @returns {Wheel} the wheel object
    * @todo Refactor this method
-   * @todo Add text to slices
    * @todo Add a border to slices
    */
   createSlices() {
@@ -130,25 +129,32 @@ class Wheel {
     const angleStep = 360 / this.sliceCount;
 
     this.wheel.empty();
-
     const sector = new Sector(0, angleStep, this.#radius);
 
     people.forEach((person, index) => {
       const angle = index * angleStep;
       const backgroundColor = new Color(`hsl(${Math.floor(angle)}, 100%, 45%)`);
 
-      let $slice = $('<div>')
+      const $slice = $('<div>')
         .addClass('slice')
         .css({
           backgroundColor: backgroundColor.toString(),
           clipPath: sector.clipPath,
-          transform: `rotate(${angle}deg)`,
+          transform: `rotate(${angle - angleStep / 2}deg)`,
         });
 
-      // const $text = $('<span>')
-      //   .addClass(backgroundColor.isDark ? 'dark' : 'light')
-      //   .text(person);
-      // part1.append($text);
+      const textPosition = {
+        x: -this.#radius / 4 - angleStep,
+        y: -this.#radius / 4 + angleStep,
+      }
+      const $text = $('<span>')
+        .addClass(backgroundColor.isDark ? 'dark' : 'light')
+        .css({
+          transform: `translate(${textPosition.x}px, ${textPosition.y}px) rotate(${angleStep / 2}deg) translateY(0.5em)`,
+          lineHeight: 0,
+        })
+        .text(person);
+      $slice.append($text);
 
       this.wheel.append($slice);
     });

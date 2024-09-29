@@ -4,19 +4,20 @@ Replacement for <https://wheelofnames.com>.
 
 ## Features
 
-MVP:
+### Theme
 
-- [ ] upload person list
-- [ ] templates for uploading
-- [ ] change color scheme (dark vs light mode)
-
-Fast Followers:
-
-- [ ] save config to ... cookies?
-- [ ] allow a "first spin is daily scrum leader" option
-- [ ] custom colors for wheel
+- [x] change color scheme (dark vs light mode)
+- [x] custom colors for wheel
 - [ ] custom wheel background image
 - [ ] confetti
+
+### Name Management
+
+- [ ] load from URL
+- [ ] selected name is removed from wheel and wheel redraws itself
+- [ ] names can be entered in text box if not provided from URL
+- [ ] names can be enabled/disabled with checkboxes
+- [ ] allow a "first spin is daily scrum leader" option
 
 ## Credits
 

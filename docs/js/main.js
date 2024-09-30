@@ -3,14 +3,14 @@ import Wheel from "./wheel.js";
 /**
  * Toggles between light and dark mode
  */
-const darkModeToggler = function() {
+function darkModeToggler() {
   const darkThemeClass = 'dark-mode';
   const lightThemeClass = 'light-mode';
 
   /**
    * Apply the dark theme class to the body
    */
-  const applyDarkMode = function() {
+  function applyDarkMode() {
     $('body').addClass(darkThemeClass);
     localStorage.setItem('theme', darkThemeClass);
   }
@@ -18,7 +18,7 @@ const darkModeToggler = function() {
   /**
    * Remove the dark theme class from the body
    */
-  const removeDarkMode = function() {
+  function removeDarkMode() {
     $('body').removeClass(darkThemeClass);
     localStorage.setItem('theme', lightThemeClass);
   }
@@ -26,7 +26,7 @@ const darkModeToggler = function() {
   /**
    * Function to toggle dark mode
    */
-  const toggleDarkMode = function() {
+  function toggleDarkMode() {
     if ($('body').hasClass(darkThemeClass)) {
       removeDarkMode();
     } else {
@@ -55,34 +55,33 @@ const darkModeToggler = function() {
   return toggleDarkMode;
 };
 
-const loadNamesFromUrl = function() {
-  const getUrlParameters = function(name) {
-    const params = new URLSearchParams(window.location.search);
-    return params.getAll(name);
-  };
-
-  const getNames = function(urlParam) {
-    return getUrlParameters(urlParam).map(decodeURIComponent);
-  }
-
-  return getNames("name");
+function loadNamesFromUrl() {
+  return new URLSearchParams(window.location.search)
+    .getAll("name")
+    .map(decodeURIComponent);
 };
 
-const shareUrl = function() {
-  const names = $('#people-input').val().split('\n').map(encodeURIComponent).join('&name=');
+function shareUrl() {
+  const names = $('#people-input').val()
+    .split('\n')
+    .filter(Boolean)
+    .map(encodeURIComponent)
+    .join('&name=');
   const url = new URL(window.location);
   url.searchParams.set('name', names);
 
   const shareableUrl = decodeURIComponent(url.href);
 
-  navigator.clipboard.writeText(shareableUrl).then(function() {
-    alert("Sharable URL copied to clipboard!");
-  }, function() {
-    alert("Failed to copy URL to clipboard.");
-  });
+  navigator.clipboard.writeText(shareableUrl).then(
+    function() {
+      alert("Sharable URL copied to clipboard!");
+    },
+    function() {
+      alert("Failed to copy URL to clipboard.");
+    });
 };
 
-const shuffle = function(objects) {
+function shuffle(objects) {
   var jdx, item;
   // Loop over the array in reverse order
   for (var idx = objects.length; idx > 0; idx--) {
@@ -96,20 +95,20 @@ const shuffle = function(objects) {
   return objects;
 };
 
-const newWheel = function() {
-  var $list = $('#people ul').empty(); // Clear existing list and select the ul
+function saveNames() {
+  var $list = $('#people ul').empty();
 
   const inputNames = $('#people-input').val().split('\n').filter(Boolean);
   inputNames.forEach((name, index) => {
-    var $li = $('<li/>');
-    var $checkbox = $('<input/>', {
+    var $li = $('<li>');
+    var $checkbox = $('<input>', {
       id: 'name_' + index,
       name: name,
       value: name,
       type: 'checkbox',
       checked: true,
     });
-    var $label = $('<label/>', {
+    var $label = $('<label>', {
       for: 'name_' + index,
       text: name
     });
@@ -125,6 +124,11 @@ const newWheel = function() {
   Wheel.self.init();
 }
 
+function updateNames() {
+  $("#configure-people").show();
+  $("#people").hide();
+}
+
 $(document).ready(function() {
   const names = shuffle(loadNamesFromUrl());
   if (names.length === 0) {
@@ -135,7 +139,8 @@ $(document).ready(function() {
 
   $("#save").on("click", shareUrl);
   $('#theme-toggle').on("click", darkModeToggler());
-  $('#go-button').on("click", newWheel);
+  $('#go-button').on("click", saveNames);
+  $('#edit-button').on("click", updateNames);
 
   $(`#people-input`).val(names.join('\n'));
 

@@ -20,7 +20,7 @@ body {
     --h2-color: #666;
     --small-color: #222;
     --small-hover-color: #666;
-    --border-color: #e5e5e5;
+    --border-color: #888;
     --hr-color: #f0f0f0;
     --code-text-color: #222;
     --winner-overlay: #b4b4b4;
@@ -42,7 +42,6 @@ body {
     --hr-color: #e5e5e5;
     --code-text-color: #e5e5e5;
     --winner-overlay: #464646;
-    // --winner-overlay: rgba(0, 0, 0, 0.75);
 
     --button-icon-position-x: 0;
   }
@@ -152,10 +151,8 @@ body {
             }
           }
 
-          #people {
-            ul {
-              margin: 0 0 2vh;
-            }
+          #people ul {
+            margin: 0 0 2vh;
           }
         }
 
@@ -164,6 +161,7 @@ body {
 
           .view {
             color: var(--small-color);
+
             ul {
               padding: 0;
             }
@@ -230,14 +228,6 @@ body {
                 }
                 &.light {
                   color: #000;
-                }
-
-                &.full-circle {
-                  border: 5px solid #fff;
-
-                  // position: absolute;
-                  // top: -75%;
-                  // left: -75%;
                 }
               }
 

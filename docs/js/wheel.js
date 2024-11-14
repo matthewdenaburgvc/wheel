@@ -160,6 +160,15 @@ class Wheel {
     $("#winner-name").text(this.#sectors[index].text);
     // show the overlay
     $("#winner-overlay").show();
+
+    // show confetti
+    confetti({
+      shapes: ['star'],
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+
     // remove the winner from the wheel
     this.#sectors.splice(index, 1);
 

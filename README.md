@@ -8,8 +8,8 @@ Replacement for <https://wheelofnames.com>.
 
 - [x] change color scheme (dark vs light mode)
 - [x] custom colors for wheel
+- [x] confetti
 - [ ] custom wheel background image
-- [ ] confetti
 
 ### Name Management
 

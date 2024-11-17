@@ -4,8 +4,8 @@
     "description": "Replacement for <https://wheelofnames.com>.",
     "main": "index.js",
     "scripts": {
-        "start": "vite docs --open",
-        "build-css": "sass --no-source-map --watch src/scss/main.scss docs/css/main.css"
+        "start": "concurrently \"npm run build-css\" \"vite\"",
+        "build-css": "sass --no-source-map src/scss/main.scss docs/css/main.css"
     },
     "repository": {
         "url": "git@github.com:matthewdenaburgvc/wheel.git",
@@ -24,13 +24,13 @@
         "singleAttributePerLine": true
     },
     "devDependencies": {
+        "concurrently": "^9.1.0",
         "prettier": "^3.3.3",
-        "sass": "^1.77.8",
-        "vite": "^5.4.11"
+        "vite": "^5.4.11",
+        "vite-plugin-sass": "^0.1.0"
     },
     "dependencies": {
         "jquery": "^3.7.1",
-        "jquery-ui": "^1.13.3",
-        "sass": "^1.77.8"
+        "jquery-ui": "^1.13.3"
     }
 }

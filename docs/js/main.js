@@ -137,7 +137,7 @@ $(document).ready(function() {
     }
   }
 
-  $("#save").on("click", shareUrl);
+  $("#share").on("click", shareUrl);
   $('#theme-toggle').on("click", darkModeToggler());
   $('#go-button').on("click", saveNames);
   $('#edit-button').on("click", updateNames);

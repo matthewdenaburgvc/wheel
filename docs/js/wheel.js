@@ -116,6 +116,7 @@ class Wheel {
 
       this.wheel.append(
         sector.toHtml().css({
+          // rotate the sector to the correct angle
           transform: `rotate(${angle}deg)`,
         })
       );

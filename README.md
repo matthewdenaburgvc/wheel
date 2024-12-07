@@ -9,7 +9,7 @@
 - [x] change color scheme (dark vs light mode)
 - [x] custom colors for wheel
 - [x] confetti
-- [ ] change save icon to share icon
+- [x] change save icon to share icon
 - [ ] custom wheel background image
 
 ### Name Management

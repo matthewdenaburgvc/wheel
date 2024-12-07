@@ -134,8 +134,8 @@ body {
               &#theme-toggle {
                 background-image: url('../images/theme.ico');
               }
-              &#save {
-                background-image: url('../images/save.ico');
+              &#share {
+                background-image: url('../images/share.ico');
               }
             }
           }
@@ -214,14 +214,13 @@ body {
               margin: 0;
 
               .name {
-                position: absolute;
-                color: #000;
-                vertical-align: middle;
+                display: block;
+                align-content: center;
+                text-align: right;
+                position: relative;
 
-                top: 75%;
-                left: 100%;
-
-                white-space: nowrap;
+                width: calc(50% - 2rem);
+                left: calc(50% + 1rem);
 
                 &.dark {
                   color: #fff;

@@ -115,8 +115,8 @@ body .wrapper section.left .header .menu .menu-item {
 body .wrapper section.left .header .menu .menu-item#theme-toggle {
   background-image: url("../images/theme.ico");
 }
-body .wrapper section.left .header .menu .menu-item#save {
-  background-image: url("../images/save.ico");
+body .wrapper section.left .header .menu .menu-item#share {
+  background-image: url("../images/share.ico");
 }
 body .wrapper section.left .content #configure-people {
   height: 60%;
@@ -175,12 +175,12 @@ body .wrapper section.right #wheel-container #wheel .slice {
   margin: 0;
 }
 body .wrapper section.right #wheel-container #wheel .slice .name {
-  position: absolute;
-  color: #000;
-  vertical-align: middle;
-  top: 75%;
-  left: 100%;
-  white-space: nowrap;
+  display: block;
+  align-content: center;
+  text-align: right;
+  position: relative;
+  width: calc(50% - 2rem);
+  left: calc(50% + 1rem);
 }
 body .wrapper section.right #wheel-container #wheel .slice .name.dark {
   color: #fff;

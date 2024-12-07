@@ -93,17 +93,22 @@ class Sector {
     const textPosition = {
       x: -this.#radius / 4 - arcAngle,
       y: -this.#radius / 4 + arcAngle
-    }
+    };
 
-    const $text = $('<span>')
+    const $text = $('<div>')
       .addClass('name')
       .addClass(this.color.isDark ? 'dark' : 'light')
       .text(this.text)
       .css({
-        transform: `translate(${textPosition.x}px, ${textPosition.y}px) rotate(${arcAngle / 2}deg)`,
+        top: `calc(50% - ${this.chord / 4}px + 1rem)`,
+        height: `${this.chord / 2}px`,
+
+        // counteract the rotation of the sector when it's added to the wheel
+        transform: `rotate(${arcAngle / 2}deg)`,
+        transformOrigin: 'left'
       });
 
-    $slice.append($text);
+      $slice.append($text);
 
     return $slice;
   };
@@ -113,6 +118,18 @@ class Sector {
     */
   get arcAngle() {
     return this.#arcAngle;
+  };
+
+  /**
+   * @see https://en.wikipedia.org/wiki/Chord_(geometry)
+   * @returns {int}
+   */
+  get chord() {
+    if (Sector.#count === 1) {
+      return this.#radius;
+    }
+
+    return this.#radius * Math.sin(this.#arcAngle.radians / 2);
   };
 
   /**

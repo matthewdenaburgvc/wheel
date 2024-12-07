@@ -1,6 +1,6 @@
-# [Wheel of Names](https://matthewdenaburgvc.github.io/wheel)
+# Wheel of Names
 
-Replacement for <https://wheelofnames.com>.
+<https://matthewdenaburgvc.github.io/wheel>
 
 ## Features
 

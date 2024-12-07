@@ -118,6 +118,9 @@ body .wrapper section.left .header .menu .menu-item#theme-toggle {
 body .wrapper section.left .header .menu .menu-item#share {
   background-image: url("../images/share.ico");
 }
+body .wrapper section.left .header .menu .menu-item#edit {
+  background-image: url("../images/edit.ico");
+}
 body .wrapper section.left .content #configure-people {
   height: 60%;
 }

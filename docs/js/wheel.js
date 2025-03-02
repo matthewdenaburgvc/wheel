@@ -130,8 +130,8 @@ class Wheel {
    */
   #spin() {
     const count = this.#sectors.length;
-    // select random sector
-    const index = Math.floor(Math.random() * count)
+    // select a random sector to stop on
+    const index = Math.floor(Math.random() * count);
     // do at most 3 rotations, and stop at that sector's angle
     const angle = Math.floor(Math.random() * 2 + 1) * 360 - 360 / count * index;
 

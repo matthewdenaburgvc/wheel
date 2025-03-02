@@ -3,14 +3,14 @@ body {
   background-color: var(--background-color);
   color: var(--text-color);
   margin: 0;
-  padding: 5vh 10vw;
+  padding: 0;
   overflow: hidden;
-  font-size: 14px/1.5;
   font-family: Arial, sans-serif;
 }
 body, body.light-mode {
   --background-color: #fff;
   --textarea-background-color: #fff;
+  --fork-me-background-color: #ddd;
   --text-color: #888;
   --strong-color: #222;
   --h1-color: #444;
@@ -21,11 +21,13 @@ body, body.light-mode {
   --hr-color: #f0f0f0;
   --code-text-color: #222;
   --winner-overlay: #b4b4b4;
+  --fork-me-size: 200px;
   --button-icon-position-x: calc(-1 * var(--button-icon-size));
 }
 body.dark-mode {
   --background-color: #222;
   --textarea-background-color: #444;
+  --fork-me-background-color: #444;
   --text-color: #fff;
   --strong-color: #f0f0f0;
   --h1-color: #ccc;
@@ -74,37 +76,37 @@ body textarea {
   background-color: var(--textarea-background-color);
   color: var(--code-text-color);
 }
-body .wrapper {
+body #content.wrapper {
   margin: 0;
-  padding: 0;
+  padding: 5vh 10vw;
   width: 80vw;
   height: 90vh;
   display: flex;
   flex-flow: row nowrap;
 }
-body .wrapper section {
+body #content.wrapper section {
   display: flex;
   flex-direction: column;
   height: 100%;
 }
-body .wrapper section.left {
+body #content.wrapper section.left {
   flex-basis: 25%;
 }
-body .wrapper section.left .header, body .wrapper section.left .footer {
+body #content.wrapper section.left .header, body #content.wrapper section.left .footer {
   text-wrap: nowrap;
   height: 18%;
   padding: 1% 0;
   margin: 0;
 }
-body .wrapper section.left .header .menu ul {
+body #content.wrapper section.left .header .menu ul {
   padding-left: 0;
   display: flex;
   flex-flow: row nowrap;
 }
-body .wrapper section.left .header .menu ul li {
+body #content.wrapper section.left .header .menu ul li {
   list-style-type: none;
 }
-body .wrapper section.left .header .menu .menu-item {
+body #content.wrapper section.left .header .menu .menu-item {
   width: var(--button-icon-size);
   height: var(--button-icon-size);
   background-position-x: var(--button-icon-position-x);
@@ -112,46 +114,46 @@ body .wrapper section.left .header .menu .menu-item {
   cursor: pointer;
   margin-right: 0.5rem;
 }
-body .wrapper section.left .header .menu .menu-item#theme-toggle {
+body #content.wrapper section.left .header .menu .menu-item#theme-toggle {
   background-image: url("../images/theme.ico");
 }
-body .wrapper section.left .header .menu .menu-item#share {
+body #content.wrapper section.left .header .menu .menu-item#share {
   background-image: url("../images/share.ico");
 }
-body .wrapper section.left .content #configure-people {
+body #content.wrapper section.left .content #configure-people {
   height: 60%;
 }
-body .wrapper section.left .content #configure-people textarea {
+body #content.wrapper section.left .content #configure-people textarea {
   height: 100%;
   width: 100%;
 }
-body .wrapper section.left .content #people ul {
+body #content.wrapper section.left .content #people ul {
   margin: 0 0 2vh;
 }
-body .wrapper section.left .footer {
+body #content.wrapper section.left .footer {
   font-size: 0.75rem;
 }
-body .wrapper section.left .footer .view {
+body #content.wrapper section.left .footer .view {
   color: var(--small-color);
 }
-body .wrapper section.left .footer .view ul {
+body #content.wrapper section.left .footer .view ul {
   padding: 0;
 }
-body .wrapper section.left .footer .view li {
+body #content.wrapper section.left .footer .view li {
   list-style-type: none;
   padding-left: 30px;
   position: relative;
 }
-body .wrapper section.left .footer .view li::before {
+body #content.wrapper section.left .footer .view li::before {
   content: "View";
   position: absolute;
   left: 0;
 }
-body .wrapper section.right {
+body #content.wrapper section.right {
   padding-left: 2vw;
   width: 75%;
 }
-body .wrapper section.right #wheel-container {
+body #content.wrapper section.right #wheel-container {
   position: relative;
   width: 100%;
   height: 100%;
@@ -159,7 +161,7 @@ body .wrapper section.right #wheel-container {
   max-height: 600px;
   font-size: 1.25rem;
 }
-body .wrapper section.right #wheel-container #wheel {
+body #content.wrapper section.right #wheel-container #wheel {
   position: relative;
   width: 100%;
   height: 100%;
@@ -167,14 +169,14 @@ body .wrapper section.right #wheel-container #wheel {
   border-radius: 50%;
   overflow: hidden;
 }
-body .wrapper section.right #wheel-container #wheel .slice {
+body #content.wrapper section.right #wheel-container #wheel .slice {
   position: absolute;
   width: 100%;
   height: 100%;
   padding: 0;
   margin: 0;
 }
-body .wrapper section.right #wheel-container #wheel .slice .name {
+body #content.wrapper section.right #wheel-container #wheel .slice .name {
   display: block;
   align-content: center;
   text-align: right;
@@ -182,16 +184,16 @@ body .wrapper section.right #wheel-container #wheel .slice .name {
   width: calc(50% - 2rem);
   left: calc(50% + 1rem);
 }
-body .wrapper section.right #wheel-container #wheel .slice .name.dark {
+body #content.wrapper section.right #wheel-container #wheel .slice .name.dark {
   color: #fff;
 }
-body .wrapper section.right #wheel-container #wheel .slice .name.light {
+body #content.wrapper section.right #wheel-container #wheel .slice .name.light {
   color: #000;
 }
-body .wrapper section.right #wheel-container #wheel .slice.border {
+body #content.wrapper section.right #wheel-container #wheel .slice.border {
   border: 1px solid var(--border-color);
 }
-body .wrapper section .content {
+body #content.wrapper section .content {
   height: 100%;
 }
 body #winner-overlay {
@@ -222,17 +224,34 @@ body #winner-overlay .winner-box * {
 body #winner-overlay .winner-box h1 {
   font-size: 3rem;
 }
+body #people {
+  display: none;
+}
+body #fork-me {
+  position: absolute;
+  width: var(--fork-me-size);
+  top: calc(var(--fork-me-size) * 0.7071067812 - 1.5rem);
+  right: calc(var(--fork-me-size) * 0.7071067812 * -0.1);
+  transform: rotate(45deg);
+  transform-origin: right;
+  margin: 0;
+  padding: 0;
+}
+body #fork-me .wrapper {
+  cursor: pointer;
+  position: relative;
+  padding: 4px;
+  text-align: center;
+  background-color: var(--fork-me-background-color);
+  border: 1px solid var(--border-color);
+}
+body #fork-me .wrapper a {
+  font-size: 0.95rem;
+  color: var(--strong-color);
+}
 body .hidden {
   display: none;
 }
 body .visible {
   display: block;
-}
-body #people {
-  display: none;
-}
-body svg {
-  width: 0;
-  height: 0;
-  position: absolute;
 }

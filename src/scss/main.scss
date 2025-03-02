@@ -5,15 +5,15 @@ body {
   color: var(--text-color);
 
   margin: 0;
-  padding: 5vh 10vw;
+  padding: 0;
   overflow: hidden; // no scrollbars
 
-  font-size: 14px/1.5;
   font-family: Arial, sans-serif;
 
   &, &.light-mode {
     --background-color: #fff;
     --textarea-background-color: #fff;
+    --fork-me-background-color: #ddd;
     --text-color: #888;
     --strong-color: #222;
     --h1-color: #444;
@@ -25,6 +25,7 @@ body {
     --code-text-color: #222;
     --winner-overlay: #b4b4b4;
 
+    --fork-me-size: 200px;
     // shift the button icons to the left for light mode
     --button-icon-position-x: calc(-1 * var(--button-icon-size));
   }
@@ -32,6 +33,7 @@ body {
   &.dark-mode {
     --background-color: #222;
     --textarea-background-color: #444;
+    --fork-me-background-color: #444;
     --text-color: #fff;
     --strong-color: #f0f0f0;
     --h1-color: #ccc;
@@ -85,9 +87,10 @@ body {
     color: var(--code-text-color);
   }
 
-  .wrapper {
+  #content.wrapper {
     margin: 0;
-    padding: 0;
+    padding: 5vh 10vw;
+
     width: 80vw;
     height: 90vh;
     display: flex;
@@ -278,20 +281,43 @@ body {
     }
   }
 
+  #people {
+    display: none;
+  }
+
+  #fork-me {
+    position: absolute;
+    width: var(--fork-me-size);
+    top: calc(var(--fork-me-size) * sin(45deg) - 1.5rem);
+    right: calc(var(--fork-me-size) * sin(45deg) * -.1);
+
+    transform: rotate(45deg);
+    transform-origin: right;
+
+    margin: 0;
+    padding: 0;
+
+    .wrapper {
+      cursor: pointer;
+      position: relative;
+      padding: 4px;
+
+      text-align: center;
+
+      background-color: var(--fork-me-background-color);
+      border: 1px solid var(--border-color);
+
+      a {
+        font-size: .95rem;
+        color: var(--strong-color);
+      }
+    }
+  }
+
   .hidden {
     display: none;
   }
   .visible {
     display: block;
-  }
-
-  #people {
-    display: none;
-  }
-
-  svg {
-    width: 0;
-    height: 0;
-    position: absolute;
   }
 }

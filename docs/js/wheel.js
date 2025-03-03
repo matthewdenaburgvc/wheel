@@ -10,6 +10,7 @@ class Wheel {
    * @type {jQuery}
    */
   wheel = null;
+
   /** the slices on the wheel
    * @type {Array<Sector>}
    */
@@ -114,12 +115,7 @@ class Wheel {
         angle = 0;
       }
 
-      this.wheel.append(
-        sector.toHtml().css({
-          // rotate the sector to the correct angle
-          transform: `rotate(${angle}deg)`,
-        })
-      );
+      this.wheel.append(sector.toHtmlAtAngle(angle));
     });
 
     return this;
@@ -130,8 +126,8 @@ class Wheel {
    */
   #spin() {
     const count = this.#sectors.length;
-    // select random sector
-    const index = Math.floor(Math.random() * count)
+    // select a random sector to stop on
+    const index = Math.floor(Math.random() * count);
     // do at most 3 rotations, and stop at that sector's angle
     const angle = Math.floor(Math.random() * 2 + 1) * 360 - 360 / count * index;
 

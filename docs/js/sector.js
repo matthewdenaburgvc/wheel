@@ -27,9 +27,9 @@ class Sector {
   };
 
   /**
-   *
+   * Convert the angle to a point in polar coordinates
    * @param {Angle} angle
-   * @returns
+   * @returns {Object} The point in polar coordinates.
    */
   #polarPoint(angle) {
     let x = this.#radius + this.#radius * Math.cos(angle.radians);
@@ -49,6 +49,34 @@ class Sector {
 
   #pointString(point) {
     return `${point.x} ${point.y}`;
+  };
+
+  toHtmlAtAngle(angleInWheel) {
+    const $slice = $('<div>')
+      .addClass('slice')
+      .css({
+        backgroundColor: this.color.toString(),
+        clipPath: this.clipPath,
+        transform: `rotate(${angleInWheel}deg)`,
+      });
+
+    const arcAngle = Sector.#count > 1 ? this.#arcAngle.degrees : 0;
+    const $text = $('<div>')
+      .addClass('name')
+      .addClass(this.color.isDark ? 'dark' : 'light')
+      .text(this.text)
+      .css({
+        top: `calc(50% - ${this.chord / 4}px + 1rem)`,
+        height: `${this.chord / 2}px`,
+
+        // counteract the rotation of the sector when it is added to the wheel
+        transform: `rotate(${arcAngle / 2}deg)`,
+        transformOrigin: 'left'
+      });
+
+    $slice.append($text);
+
+    return $slice;
   };
 
   get clipPath() {
@@ -77,42 +105,6 @@ class Sector {
     return `path("${path}")`;
   };
 
-  get $text() {
-
-  };
-
-  toHtml() {
-    const $slice = $('<div>')
-      .addClass('slice')
-      .css({
-        backgroundColor: this.color.toString(),
-        clipPath: this.clipPath,
-      });
-
-    const arcAngle = Sector.#count > 1 ? this.#arcAngle.degrees : 0;
-    const textPosition = {
-      x: -this.#radius / 4 - arcAngle,
-      y: -this.#radius / 4 + arcAngle
-    };
-
-    const $text = $('<div>')
-      .addClass('name')
-      .addClass(this.color.isDark ? 'dark' : 'light')
-      .text(this.text)
-      .css({
-        top: `calc(50% - ${this.chord / 4}px + 1rem)`,
-        height: `${this.chord / 2}px`,
-
-        // counteract the rotation of the sector when it's added to the wheel
-        transform: `rotate(${arcAngle / 2}deg)`,
-        transformOrigin: 'left'
-      });
-
-      $slice.append($text);
-
-    return $slice;
-  };
-
   /**
     * @returns {Angle}
     */
@@ -121,6 +113,14 @@ class Sector {
   };
 
   /**
+   * @param {number} newAngle - The angle, in degrees.
+   */
+  set arcAngle(newAngle) {
+    this.#arcAngle = new Angle(newAngle);
+  };
+
+  /**
+   * A chord of a circle is a straight line segment whose endpoints both lie on a circular arc.
    * @see https://en.wikipedia.org/wiki/Chord_(geometry)
    * @returns {int}
    */
@@ -130,13 +130,6 @@ class Sector {
     }
 
     return this.#radius * Math.sin(this.#arcAngle.radians / 2);
-  };
-
-  /**
-   * @param {number} newAngle - The angle, in degrees.
-   */
-  set arcAngle(newAngle) {
-    this.#arcAngle = new Angle(newAngle);
   };
 
   /**

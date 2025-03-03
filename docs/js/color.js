@@ -81,20 +81,20 @@ class Color {
   }
 
   /**
-   * Convert RGB color to HEX.
-   * @param {string} color - The RGB color string.
-   * @returns {string} The HEX color string.
+   * Convert the value to a hex color.
+   * @param {string} color - the color string (RGB, HSL, or hex).
+   * @returns {string} The hex color string.
    */
   toHex(color) {
-    // If RGB --> store the red, green, blue values in separate variables
+    // RGB
     if (color.match(/^rgb/i)) {
       return this.fromRGB(color);
     }
-    // if hsl --> convert to rgb
+    // HSL
     if (color.match(/^hsl/i)) {
       return this.fromHSL(color);
     }
-    // If HEX --> return the color
+    // Hex
     if (color.match(/^#/)) {
       return color;
     }

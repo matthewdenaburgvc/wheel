@@ -10,6 +10,7 @@ class Wheel {
    * @type {jQuery}
    */
   wheel = null;
+
   /** the slices on the wheel
    * @type {Array<Sector>}
    */
@@ -114,12 +115,7 @@ class Wheel {
         angle = 0;
       }
 
-      this.wheel.append(
-        sector.toHtml().css({
-          // rotate the sector to the correct angle
-          transform: `rotate(${angle}deg)`,
-        })
-      );
+      this.wheel.append(sector.toHtmlAtAngle(angle));
     });
 
     return this;

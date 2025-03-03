@@ -95,6 +95,21 @@ function shuffle(objects) {
   return objects;
 };
 
+let name = {
+  text: "",
+  enabled: true,
+  selected: false,
+
+  get: function() {
+    return this.text;
+  }
+};
+
+let theNames = {
+  visible: true,
+  names: [],
+};
+
 function saveNames() {
   var $list = $('#people ul').empty();
 
@@ -124,7 +139,7 @@ function saveNames() {
   Wheel.self.init();
 }
 
-function updateNames() {
+function editNames() {
   $("#configure-people").show();
   $("#people").hide();
 }
@@ -140,10 +155,9 @@ $(document).ready(function() {
   $("#share").on("click", shareUrl);
   $('#theme-toggle').on("click", darkModeToggler());
   $('#go-button').on("click", saveNames);
-  $('#edit-button').on("click", updateNames);
+  $('#edit-button').on("click", editNames);
 
   $(`#people-input`).val(names.join('\n'));
 
   new Wheel(names).init();
 });
-

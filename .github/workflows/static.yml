@@ -1,22 +1,13 @@
-# Simple workflow for deploying static content to GitHub Pages
-name: Deploy static content to Pages
+name: Deploy static content to Pages for Pull Requests
 
 on:
-  # # Runs on pushes targeting the default branch
-  # pull_request_target:
-  #   branches:
-  #     - main
-
   push:
+    branches:
+      - main
 
-  # A push is made to a GitHub Pages-enabled branch
-  page_build:
-
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
-permissions:
-  pages: write
+  pull_request_target:
+    branches:
+      - main
 
 jobs:
   build:
@@ -37,16 +28,34 @@ jobs:
         with:
           path: 'docs/'
 
-  # Single deploy job since we're just deploying
-  deploy:
+  pull_request_deploy:
     runs-on: ubuntu-latest
+    # deploy to preview area on pull requests
+    if: ${{ github.event_name == 'pull_request_target' }}
+
     needs: build
     permissions:
       pages: write
     environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      name: pull-request
+      url: https://${{ github.repository_owner}}.github.io/wheel/pr-preview/${{ github.head_ref }}
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  # production_deploy:
+  #   runs-on: ubuntu-latest
+  #   # Only deploy on pushes to the main branch
+  #   if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+
+  #   needs: build
+  #   permissions:
+  #     pages: write
+  #   environment:
+  #     name: production
+  #     url: ${{ steps.deployment.outputs.page_url }}
+  #   steps:
+  #     - name: Deploy to GitHub Pages
+  #       id: deployment
+  #       uses: actions/deploy-pages@v4

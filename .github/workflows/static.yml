@@ -51,7 +51,10 @@ jobs:
       - name: Deploy preview
         uses: rossjrw/pr-preview-action@v1
         with:
-          source_dir: docs
+          source_dir: dist
+          pages-base-path: docs
+          preview-branch: ${{ github.head_ref }}
+          umbrella-dir: docs/pr-preview
           comment: false
 
     # steps:
@@ -59,20 +62,20 @@ jobs:
     #     id: deployment
     #     uses: actions/deploy-pages@v4
 
-  # production_deploy:
-  #   runs-on: ubuntu-latest
-  #   # Only deploy on pushes to the main branch
-  #   # if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-  #   if: false
+  production_deploy:
+    runs-on: ubuntu-latest
+    # Only deploy on pushes to the main branch
+    # if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    if: false
 
-  #   needs: build
-  #   permissions:
-  #     pages: write
-  #     id-token: write
-  #   environment:
-  #     name: production
-  #     url: ${{ steps.deployment.outputs.page_url }}
-  #   steps:
-  #     - name: Deploy to GitHub Pages
-  #       id: deployment
-  #       uses: actions/deploy-pages@v4
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: production
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

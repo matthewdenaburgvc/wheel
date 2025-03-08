@@ -47,7 +47,7 @@ jobs:
       id-token: write
     environment:
       name: pull-request
-      url: https://${{ github.repository_owner}}.github.io/wheel/pr-preview/${{ github.head_ref }}
+      # url: https://${{ github.repository_owner}}.github.io/wheel/pr-preview/${{ github.head_ref }}
     steps:
       - name: Deploy preview
         uses: rossjrw/pr-preview-action@v1

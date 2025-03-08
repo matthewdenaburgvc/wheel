@@ -7,6 +7,8 @@ on:
   #   branches:
   #     - main
 
+  push:
+
   # A push is made to a GitHub Pages-enabled branch
   page_build:
 

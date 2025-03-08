@@ -36,6 +36,7 @@ jobs:
     needs: build
     permissions:
       pages: write
+      id-token: write
     environment:
       name: pull-request
       url: https://${{ github.repository_owner}}.github.io/wheel/pr-preview/${{ github.head_ref }}
@@ -44,18 +45,19 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-  # production_deploy:
-  #   runs-on: ubuntu-latest
-  #   # Only deploy on pushes to the main branch
-  #   if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+  production_deploy:
+    runs-on: ubuntu-latest
+    # Only deploy on pushes to the main branch
+    # if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    if: false
 
-  #   needs: build
-  #   permissions:
-  #     pages: write
-  #   environment:
-  #     name: production
-  #     url: ${{ steps.deployment.outputs.page_url }}
-  #   steps:
-  #     - name: Deploy to GitHub Pages
-  #       id: deployment
-  #       uses: actions/deploy-pages@v4
+    needs: build
+    permissions:
+      pages: write
+    environment:
+      name: production
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

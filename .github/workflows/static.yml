@@ -50,10 +50,11 @@ jobs:
     steps:
       - name: Deploy preview
         uses: rossjrw/pr-preview-action@v1
+        id: preview-deployment
         with:
           source-dir: dist
           pages-base-path: docs
-          preview-branch: ${{ github.head_ref }}
+          # preview-branch: ${{ github.head_ref }}
           umbrella-dir: docs/pr-preview
           comment: false
 

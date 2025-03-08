@@ -1,9 +1,0 @@
-{
-  "compilerOptions": {
-    "outDir": "./docs/js",
-    "allowJs": true,
-    "target": "ES6",
-    "esModuleInterop": true,
-  },
-  "include": ["./src/**/*.ts"],
-}

@@ -18,7 +18,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     # skip the build if the PR has been closed
-    if: false
     if: ${{ github.event.action != 'closed' }}
 
     steps:
@@ -38,6 +37,7 @@ jobs:
 
   pull_request_deploy:
     runs-on: ubuntu-latest
+    if: false
     # deploy to preview area on pull requests
     if: ${{ github.event_name == 'pull_request' }}
 

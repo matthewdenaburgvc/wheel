@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "./docs/js",
+    "outDir": "./dist/js",
     "allowJs": true,
     "target": "ES6",
     "esModuleInterop": true,

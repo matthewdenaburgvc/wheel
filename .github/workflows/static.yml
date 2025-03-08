@@ -35,30 +35,29 @@ jobs:
         with:
           path: dist
 
-  # pull_request_deploy:
-  #   runs-on: ubuntu-latest
-  #   if: false
-  #   # deploy to preview area on pull requests
-  #   if: ${{ github.event_name == 'pull_request' }}
+  pull_request_deploy:
+    runs-on: ubuntu-latest
+    # deploy to preview area on pull requests
+    if: ${{ github.event_name == 'pull_request' }}
 
-  #   needs: build
-  #   permissions:
-  #     pages: write
-  #     id-token: write
-  #   environment:
-  #     name: pull-request
-  #     # url: https://${{ github.repository_owner}}.github.io/wheel/pr-preview/${{ github.head_ref }}
-  #   steps:
-  #     - name: Deploy preview
-  #       uses: rossjrw/pr-preview-action@v1
-  #       with:
-  #         source_dir: docs
-  #         comment: false
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: pull-request
+      # url: https://${{ github.repository_owner}}.github.io/wheel/pr-preview/${{ github.head_ref }}
+    steps:
+      - name: Deploy preview
+        uses: rossjrw/pr-preview-action@v1
+        with:
+          source_dir: docs
+          comment: false
 
-  #   # steps:
-  #   #   - name: Deploy to GitHub Pages
-  #   #     id: deployment
-  #   #     uses: actions/deploy-pages@v4
+    # steps:
+    #   - name: Deploy to GitHub Pages
+    #     id: deployment
+    #     uses: actions/deploy-pages@v4
 
   # production_deploy:
   #   runs-on: ubuntu-latest

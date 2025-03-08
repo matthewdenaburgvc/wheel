@@ -4,15 +4,17 @@
     "description": "Replacement for <https://wheelofnames.com>.",
     "main": "index.js",
     "scripts": {
-      "build": "npm run build:assets && npm run build:css && npm run build:ts && npm run build:index",
-      "build:index": "cp -f src/layouts/index.html dist/index.html",
-      "build:assets": "cp -rf src/assets dist/assets",
-      "build:ts": "tsc",
-      "build:css": "sass --no-source-map src/scss/main.scss dist/css/main.css",
-      "build:clean": "rm -rf dist/* && touch dist/.gitkeep",
-      "start": "concurrently npm:build:assets npm:build:index npm:dev:build:css npm:dev:build:ts",
-      "dev:build:css": "sass --watch --no-source-map src/scss/main.scss dist/css/main.css",
-      "dev:build:ts": "tsc --watch"
+        "build": "npm run build:assets && npm run build:css && npm run build:ts && npm run build:index",
+        "build:index": "cp -f src/layouts/index.html dist/*/index.html",
+        "build:assets": "cp -rf src/assets dist/{dev,prod}assets",
+        "build:ts": "tsc",
+        "build:css": "sass --no-source-map src/scss/main.scss dist/css/main.css",
+        "build:clean": "rm -rf dist/* dev/* && touch dist/.gitkeep dev/.gitkeep",
+        "start": "concurrently npm:dev:build:assets npm:dev:build:index npm:dev:build:css npm:dev:build:ts",
+        "dev:build:index": "cp -f src/layouts/index.html dev/index.html",
+        "dev:build:assets": "cp -rf src/assets dev/assets",
+        "dev:build:css": "sass --watch --no-source-map src/scss/main.scss dev/css/main.css",
+        "dev:build:ts": "tsc --watch --outDir dev"
     },
     "repository": {
         "url": "git@github.com:matthewdenaburgvc/wheel.git",

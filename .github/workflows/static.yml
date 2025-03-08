@@ -53,9 +53,7 @@ jobs:
         id: preview-deployment
         with:
           source-dir: dist
-          pages-base-path: docs
           # preview-branch: ${{ github.head_ref }}
-          umbrella-dir: docs/pr-preview
           comment: false
 
     # steps:

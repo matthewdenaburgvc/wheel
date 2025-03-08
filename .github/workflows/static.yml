@@ -52,8 +52,8 @@ jobs:
         uses: rossjrw/pr-preview-action@v1
         id: preview-deployment
         with:
-          # source-dir: dist
-          # preview-branch: ${{ github.head_ref }}
+          source-dir: dist
+          preview-branch: preview-${{ github.head_ref }}
           comment: false
 
     # steps:

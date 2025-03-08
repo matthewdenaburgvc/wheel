@@ -2,11 +2,13 @@
 *#*
 .idea
 
-# Ignore bundler config.
-/.bundle
-
 # Ignore all logfiles and tempfiles.
 /log
 /tmp
 
 /node_modules
+
+dist
+docs
+
+!**/.gitkeep

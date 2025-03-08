@@ -52,7 +52,7 @@ jobs:
         uses: rossjrw/pr-preview-action@v1
         id: preview-deployment
         with:
-          source-dir: dist
+          # source-dir: dist
           # preview-branch: ${{ github.head_ref }}
           comment: false
 

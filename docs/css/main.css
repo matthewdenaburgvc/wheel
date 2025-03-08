@@ -120,6 +120,9 @@ body #content.wrapper section.left .header .menu .menu-item#theme-toggle {
 body #content.wrapper section.left .header .menu .menu-item#share {
   background-image: url("../images/share.ico");
 }
+body #content.wrapper section.left .header .menu .menu-item#edit {
+  background-image: url("../images/edit.ico");
+}
 body #content.wrapper section.left .content #configure-people {
   height: 60%;
 }

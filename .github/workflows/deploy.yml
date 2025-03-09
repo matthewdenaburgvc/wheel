@@ -1,0 +1,53 @@
+name: build and deploy
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - closed
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # skip the build if the PR has been closed
+    if: ${{ github.event.action != 'closed' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v5
+      - name: Build static content
+        run: |
+          npm install
+          npm run build
+      - name: Upload files as artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+
+  production_deploy:
+    runs-on: ubuntu-latest
+    # # Only deploy on pushes to the main branch
+    # if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: production
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

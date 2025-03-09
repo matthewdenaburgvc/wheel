@@ -6,7 +6,8 @@
     "scripts": {
         "start": "vite",
         "preview": "vite build && vite preview",
-        "build": "vite build"
+        "build": "vite build",
+        "build:staging": "NODE_ENV=staging vite build"
     },
     "repository": {
         "url": "git@github.com:matthewdenaburgvc/wheel.git",

@@ -115,10 +115,10 @@ body #content.wrapper section.left .header .menu .menu-item {
   margin-right: 0.5rem;
 }
 body #content.wrapper section.left .header .menu .menu-item#theme-toggle {
-  background-image: url("../images/theme.ico");
+  background-image: url("/assets/theme-MCRkfatO.ico");
 }
 body #content.wrapper section.left .header .menu .menu-item#share {
-  background-image: url("../images/share.ico");
+  background-image: url("/assets/share-CEbuK8gC.ico");
 }
 body #content.wrapper section.left .content #configure-people {
   height: 60%;

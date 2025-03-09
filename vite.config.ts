@@ -8,10 +8,11 @@ export default {
 
     cssMinify: false,
     sourcemap: false,
+    emptyOutDir: true,
   },
 
   root: './src',
-  publicDir: '../docs',
+  // publicDir: '../docs',
   assetsInclude: ['../docs/'],
 
   css: {

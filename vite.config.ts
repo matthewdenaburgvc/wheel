@@ -12,9 +12,7 @@ export default {
   },
 
   root: './src',
-  base: 'wheel',
-  // publicDir: '../docs',
-  assetsInclude: ['../docs/'],
+  base: '/wheel',
 
   css: {
     devSourcemap: false

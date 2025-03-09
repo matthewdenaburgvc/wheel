@@ -1,4 +1,16 @@
-import Wheel from "./wheel.js";
+import $ from "jquery";
+import Wheel from "./wheel";
+
+declare global {
+  interface Array<T> {
+    randomize(): Array<T>;
+  }
+}
+
+Array.prototype.randomize = function() {
+  // randomize objects
+  return this.sort(() => Math.random() - 0.5);
+}
 
 /**
  * Toggles between light and dark mode
@@ -53,21 +65,24 @@ function darkModeToggler() {
   }
 
   return toggleDarkMode;
-};
+}
 
-function loadNamesFromUrl() {
+function loadNamesFromUrl(): Array<string> {
   return new URLSearchParams(window.location.search)
     .getAll("name")
     .map(decodeURIComponent);
-};
+}
 
-function shareUrl() {
-  const names = $('#people-input').val()
+function shareUrl(): void {
+  const names = $('#people-input')
+    .val()!
+    .toString()
     .split('\n')
     .filter(Boolean)
     .map(encodeURIComponent)
     .join('&name=');
-  const url = new URL(window.location);
+
+  const url = new URL(window.location.href);
   url.searchParams.set('name', names);
 
   const shareableUrl = decodeURIComponent(url.href);
@@ -79,26 +94,12 @@ function shareUrl() {
     function() {
       alert("Failed to copy URL to clipboard.");
     });
-};
+}
 
-function shuffle(objects) {
-  var jdx, item;
-  // Loop over the array in reverse order
-  for (var idx = objects.length; idx > 0; idx--) {
-    // Generate a random index j
-    jdx = parseInt(Math.random() * idx);
-    // Swap elements at indices i-1 and j
-    item = objects[idx - 1];
-    objects[idx - 1] = objects[jdx];
-    objects[jdx] = item;
-  }
-  return objects;
-};
-
-function saveNames() {
+function saveNames(): void {
   var $list = $('#people ul').empty();
 
-  const inputNames = $('#people-input').val().split('\n').filter(Boolean);
+  const inputNames = $('#people-input').val()!.toString().split('\n').filter(Boolean);
   inputNames.forEach((name, index) => {
     var $li = $('<li>');
     var $checkbox = $('<input>', {
@@ -120,30 +121,13 @@ function saveNames() {
   $('#configure-people').hide();
   $('#people').show();
 
-  Wheel.self.names = shuffle(inputNames);
+  Wheel.self.names = inputNames.randomize();
   Wheel.self.init();
 }
 
-function updateNames() {
+function updateNames(): void {
   $("#configure-people").show();
   $("#people").hide();
 }
 
-$(document).ready(function() {
-  const names = shuffle(loadNamesFromUrl());
-  if (names.length === 0) {
-    for (let i = 1; i <= 6; i++) {
-      names.push(`Person ${i}`);
-    }
-  }
-
-  $("#share").on("click", shareUrl);
-  $('#theme-toggle').on("click", darkModeToggler());
-  $('#go-button').on("click", saveNames);
-  $('#edit-button').on("click", updateNames);
-
-  $(`#people-input`).val(names.join('\n'));
-
-  new Wheel(names).init();
-});
-
+export { loadNamesFromUrl, shareUrl, saveNames, updateNames, darkModeToggler };

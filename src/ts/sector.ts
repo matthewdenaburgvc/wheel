@@ -1,16 +1,20 @@
-import Angle from "./angle.js";
-import Color from "./color.js";
+import $ from "jquery";
+import Angle from "./angle";
+import Color from "./color";
 
 class Sector {
   private static count: number = 0;
   private _initialAngle: Angle = new Angle(0);
   private _finalAngle: Angle = new Angle(0);
-  private _backgroundColor: Color = null;
+  private _backgroundColor: Color;
   private _radius: number = 0;
-  private _text: string = null;
+  private _text: string = '';
 
-  constructor(color: Color, text: string) {
-    this._backgroundColor = color;
+  /**
+   * @param colorAngle the angle this Sector is oriented to.
+   */
+  constructor(colorAngle: number, text: string) {
+    this._backgroundColor = new Color(`hsl(${Math.floor(colorAngle)}, 100%, 45%)`);
     this._text = text;
   }
 
@@ -118,7 +122,7 @@ class Sector {
     this._radius = newRadius;
   }
 
-  static updateCount(count: number): void {
+  static setCount(count: number): void {
     Sector.count = count;
   }
 }

@@ -1,8 +1,13 @@
-import type { UserConfig } from 'vite'
+import type { UserConfig } from 'vite';
+
+const outDir: string = `../${process.env.OUT_DIR}` || '../docs/local';
 
 export default {
+  root: './src',
+  base: '/wheel',
+
   build: {
-    outDir: '../docs',
+    outDir: outDir,
 
     target: 'es6',
 
@@ -11,11 +16,6 @@ export default {
     emptyOutDir: true,
   },
 
-  root: './src',
-  base: 'wheel',
-  // publicDir: '../docs',
-  assetsInclude: ['../docs/'],
-
   css: {
     devSourcemap: false
   },
@@ -23,4 +23,4 @@ export default {
   server: {
     open: true
   }
-} satisfies UserConfig;
+} satisfies UserConfig

@@ -1,12 +1,13 @@
 {
-    "name": "wheel",
+    "name": "wheel-of-names",
     "version": "1.0.0",
     "description": "Replacement for <https://wheelofnames.com>.",
-    "main": "index.js",
+    "main": "index.ts",
     "scripts": {
-        "build:css": "sass --no-source-map src/scss/main.scss docs/css/main.css",
-        "start": "concurrently npm:build:css vite",
-        "dev:build:css": "sass --watch --no-source-map src/scss/main.scss docs/css/main.css"
+        "start": "vite",
+        "preview": "vite build && vite preview",
+        "build": "vite build",
+        "build:staging": "NODE_ENV=staging vite build"
     },
     "repository": {
         "url": "git@github.com:matthewdenaburgvc/wheel.git",
@@ -16,8 +17,15 @@
         "node": "22.4.1",
         "npm": "^10.8.1"
     },
-    "keywords": [],
-    "author": "",
+    "keywords": [
+        "wheel",
+        "random",
+        "picker"
+    ],
+    "author": {
+        "name": "Matthew Denaburg",
+        "email": "matthew.denaburg@veracross.com"
+    },
     "license": "UNLICENSED",
     "prettier": {
         "singleQuote": false,
@@ -27,10 +35,9 @@
     "devDependencies": {
         "@types/canvas-confetti": "^1.9.0",
         "@types/jquery": "^3.5.32",
-        "concurrently": "^9.1.0",
-        "prettier": "^3.3.3",
+        "@types/node": "^22.13.10",
+        "@types/node-sass": "^4.11.8",
         "sass-embedded": "^1.85.1",
-        "tspath": "^2.6.8",
         "typescript": "^5.8.2",
         "vite": "^5.4.14",
         "vite-plugin-sass": "^0.1.0"

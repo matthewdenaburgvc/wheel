@@ -1,20 +1,18 @@
-import type { UserConfig } from 'vite'
+import type { UserConfig } from 'vite';
+
+const env = process.env.NODE_ENV || 'main';
 
 export default {
+  root: './src',
+  base: '/wheel',
+
   build: {
-    outDir: '../docs',
-
+    outDir: `../public/${env}`,
     target: 'es6',
-
     cssMinify: false,
     sourcemap: false,
     emptyOutDir: true,
   },
-
-  root: './src',
-  base: 'wheel',
-  // publicDir: '../docs',
-  assetsInclude: ['../docs/'],
 
   css: {
     devSourcemap: false
@@ -23,4 +21,4 @@ export default {
   server: {
     open: true
   }
-} satisfies UserConfig;
+} satisfies UserConfig

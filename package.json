@@ -6,7 +6,7 @@
     "scripts": {
         "start": "vite",
         "preview": "vite build && vite preview",
-        "build": "vite build",
+        "build": "NODE_ENV=main vite build",
         "build:staging": "NODE_ENV=staging vite build"
     },
     "repository": {
